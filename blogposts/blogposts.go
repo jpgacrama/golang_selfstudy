@@ -8,6 +8,9 @@ import (
 type Post struct {
 }
 
+type StubFailingFS struct {
+}
+
 func NewPostsFromFS(fileSystem fstest.MapFS) ([]Post, error) {
 	dir, err := fs.ReadDir(fileSystem, ".")
 	if err != nil {
@@ -19,4 +22,8 @@ func NewPostsFromFS(fileSystem fstest.MapFS) ([]Post, error) {
 		posts = append(posts, Post{})
 	}
 	return posts, nil
+}
+
+func (s StubFailingFS) Open(name string) (fs.File, error) {
+	return nil, errors.New("oh no, i always fail")
 }
