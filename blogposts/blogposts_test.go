@@ -3,7 +3,6 @@ package blogposts
 import (
 	"testing"
 	"testing/fstest"
-	"github.com/jpgacrama/blogposts"
 )
 
 func TestNewBlogPosts(t *testing.T) {
@@ -12,7 +11,7 @@ func TestNewBlogPosts(t *testing.T) {
 		"hello world2.md": {Data: []byte("hola")},
 	}
 
-	posts := blogposts.NewPostsFromFS(fs)
+	posts := NewPostsFromFS(fs)
 	if len(posts) != len(fs) {
 		t.Errorf("got %d posts, wanted %d posts", len(posts), len(fs))
 	}
