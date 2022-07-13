@@ -1,11 +1,13 @@
 package blogposts
 
 import (
+	"errors"
 	"io/fs"
 	"testing/fstest"
 )
 
 type Post struct {
+	Title string
 }
 
 type StubFailingFS struct {
@@ -25,5 +27,5 @@ func NewPostsFromFS(fileSystem fstest.MapFS) ([]Post, error) {
 }
 
 func (s StubFailingFS) Open(name string) (fs.File, error) {
-	return nil, errors.New("oh no, i always fail")
+	return nil, errors.New("oh no, I always fail")
 }
