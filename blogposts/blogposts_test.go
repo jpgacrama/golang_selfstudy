@@ -49,7 +49,7 @@ func assertPost(t *testing.T, got Post, want Post) {
 }
 
 func replaceExtraSpaces(text string) string {
-	space := regexp.MustCompile(`\s+`)
+	space := regexp.MustCompile(`\t+`)
 	textWithoutSpace := space.ReplaceAllString(text, " ")
 	return textWithoutSpace
 }
