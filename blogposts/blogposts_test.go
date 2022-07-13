@@ -34,6 +34,11 @@ func TestNewBlogPosts(t *testing.T) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %+v, want %+v", got, want)
 	}
+
+	assertPost(t, posts[0], Post{
+		Title:       "Post 1",
+		Description: "Description 1",
+	})
 }
 
 func assertPost(t *testing.T, got Post, want Post) {
