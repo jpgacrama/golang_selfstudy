@@ -14,28 +14,26 @@ type Post struct {
 type StubFailingFS struct {
 }
 
-func NewPostsFromFS(fileSystem fstest.MapFS) ([]Post, error) {
+func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
 	dir, err := fs.ReadDir(fileSystem, ".")
 	if err != nil {
 		return nil, err
 	}
 	var posts []Post
-
 	for _, f := range dir {
-		post, err := getPost(fileSystem, f)
+		post, err := getPost(fileSystem, f.Name())
 		if err != nil {
-			//todo: needs clarification,
-			// should we totally fail if one file fails? or just ignore?
+			// todo: needs clarification, should we
+			// totally fail if one file fails? or just ignore?
 			return nil, err
 		}
 		posts = append(posts, post)
 	}
-
 	return posts, nil
 }
 
-func getPost(fileSystem fs.FS, f fs.DirEntry) (Post, error) {
-	postFile, err := fileSystem.Open(f.Name())
+func getPost(fileSystem fs.FS, fileName string) (Post, error) {
+	postFile, err := fileSystem.Open(fileName)
 	if err != nil {
 		return Post{}, err
 	}
@@ -43,7 +41,7 @@ func getPost(fileSystem fs.FS, f fs.DirEntry) (Post, error) {
 	return newPost(postFile)
 }
 
-func newPost(postFile fs.File) (Post, error) {
+func newPost(postFile io.Reader) (Post, error) {
 	postData, err := io.ReadAll(postFile)
 	if err != nil {
 		return Post{}, err
