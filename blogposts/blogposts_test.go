@@ -10,13 +10,15 @@ import (
 func TestNewBlogPosts(t *testing.T) {
 	const (
 		firstBody = `Title: Post 1
-					Description: Description 1`
+					Description: Description 1
+					Tags: tdd, go`
 		secondBody = `Title: Post 2
-					Description: Description 2`
+					Description: Description 2
+					Tags: rust, borrow-checker`
 	)
 
 	fs := fstest.MapFS{
-		"hello-world.md)": {Data: []byte(replaceExtraSpaces(firstBody))},
+		"hello-world.md":  {Data: []byte(replaceExtraSpaces(firstBody))},
 		"hello-world2.md": {Data: []byte(replaceExtraSpaces(secondBody))},
 	}
 	posts, err := NewPostsFromFS(fs)
@@ -38,6 +40,7 @@ func TestNewBlogPosts(t *testing.T) {
 	assertPost(t, posts[0], Post{
 		Title:       "Post 1",
 		Description: "Description 1",
+		Tags:        []string{"tdd", "go"},
 	})
 }
 
