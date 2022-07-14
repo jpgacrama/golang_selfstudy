@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"strings"
 )
 
 type Post struct {
@@ -47,18 +48,18 @@ func getPost(fileSystem fs.FS, fileName string) (Post, error) {
 	return newPost(postFile)
 }
 
-func newPost(postFile io.Reader) (Post, error) {
-    scanner := bufio.NewScanner(postFile)
+func newPost(postBody io.Reader) (Post, error) {
+    scanner := bufio.NewScanner(postBody)
 
-    readLine := func() string {
-		scanner.Scan()
-        return scanner.Text()
-    }
+    readMetaLine := func(tagName string) string {
+        scanner.Scan()
+        return strings.TrimPrefix(scanner.Text(), tagName)
+	}
 
-    title := readLine()[len(titleSeparator):]
-    description := readLine()[len(descriptionSeparator):]
-
-    return Post{Title: title, Description: description}, nil
+    return Post{
+        Title:       readMetaLine(titleSeparator),
+        Description: readMetaLine(descriptionSeparator),
+    }, nil
 }
 
 func (s StubFailingFS) Open(name string) (fs.File, error) {

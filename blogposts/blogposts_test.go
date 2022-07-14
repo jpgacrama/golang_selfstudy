@@ -29,7 +29,7 @@ func TestNewBlogPosts(t *testing.T) {
 	}
 
 	got := posts[0]
-	want := Post{Title: "Post 1"}
+	want := Post{Title: "Post 1", Description: "Description 1"}
 
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %+v, want %+v", got, want)
