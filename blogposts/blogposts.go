@@ -17,8 +17,8 @@ type StubFailingFS struct {
 }
 
 const (
-    titleSeparator       = "Title: "
-    descriptionSeparator = "Description: "
+	titleSeparator       = "Title: "
+	descriptionSeparator = "Description: "
 )
 
 func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
@@ -48,18 +48,17 @@ func getPost(fileSystem fs.FS, fileName string) (Post, error) {
 	return newPost(postFile)
 }
 
+func readMetaLine(scanner *bufio.Scanner, tagName string) string {
+	scanner.Scan()
+	return strings.TrimPrefix(scanner.Text(), tagName)
+}
+
 func newPost(postBody io.Reader) (Post, error) {
-    scanner := bufio.NewScanner(postBody)
-
-    readMetaLine := func(tagName string) string {
-        scanner.Scan()
-        return strings.TrimPrefix(scanner.Text(), tagName)
-	}
-
-    return Post{
-        Title:       readMetaLine(titleSeparator),
-        Description: readMetaLine(descriptionSeparator),
-    }, nil
+	scanner := bufio.NewScanner(postBody)
+	return Post{
+		Title:       readMetaLine(scanner, titleSeparator),
+		Description: readMetaLine(scanner, descriptionSeparator),
+	}, nil
 }
 
 func (s StubFailingFS) Open(name string) (fs.File, error) {
