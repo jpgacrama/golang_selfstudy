@@ -12,6 +12,7 @@ type Post struct {
 	Title       string
 	Description string
 	Tags        []string
+	Body        string
 }
 
 type StubFailingFS struct {
@@ -21,6 +22,7 @@ const (
 	titleSeparator       = "Title: "
 	descriptionSeparator = "Description: "
 	tagsSeparator        = "Tags: "
+	bodySeparator        = "---"
 )
 
 func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
@@ -61,6 +63,7 @@ func newPost(postBody io.Reader) (Post, error) {
 		Title:       readMetaLine(scanner, titleSeparator),
 		Description: readMetaLine(scanner, descriptionSeparator),
 		Tags:        strings.Split(readMetaLine(scanner, tagsSeparator), ", "),
+		Body:        readMetaLine(scanner, bodySeparator),
 	}, nil
 }
 
