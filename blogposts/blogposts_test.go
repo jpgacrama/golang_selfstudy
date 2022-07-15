@@ -22,13 +22,7 @@ func TestNewBlogPosts(t *testing.T) {
 		"hello-world2.md": {Data: []byte(replaceExtraSpaces(secondBody))},
 	}
 	posts, err := NewPostsFromFS(fs)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(posts) != len(fs) {
-		t.Errorf("got %+v posts, wanted %+v posts", len(posts), len(fs))
-	}
+	assertDataIntegrityOfPosts(err, posts, t, fs)
 
 	got := posts[0]
 	want := Post{Title: "Post 1", Description: "Description 1"}
@@ -42,6 +36,17 @@ func TestNewBlogPosts(t *testing.T) {
 		Description: "Description 1",
 		Tags:        []string{"tdd", "go"},
 	})
+}
+
+func assertDataIntegrityOfPosts(
+	err error, posts []Post, t *testing.T, fs fstest.MapFS) {
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(posts) != len(fs) {
+		t.Errorf("got %+v posts, wanted %+v posts", len(posts), len(fs))
+	}
 }
 
 func assertPost(t *testing.T, got Post, want Post) {
