@@ -36,8 +36,8 @@ func TestNewBlogPosts(t *testing.T) {
 		Title:       "Post 1",
 		Description: "Description 1",
 		Tags:        []string{"tdd", "go"},
-		Body: `Hello
-				World`,
+		Body: replaceExtraSpaces(`Hello
+								World`),
 	})
 }
 
