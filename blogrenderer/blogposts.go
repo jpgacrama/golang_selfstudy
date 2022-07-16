@@ -73,3 +73,8 @@ func newPost(postBody io.Reader) (Post, error) {
 		Body:        readBody(scanner),
 	}, nil
 }
+
+func Render(w io.Writer, p Post) error {
+	_, err := fmt.Fprintf(w, "<h1>%s</h1>", p.Title)
+	return err
+}
