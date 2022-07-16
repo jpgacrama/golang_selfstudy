@@ -80,7 +80,7 @@ func Render(w io.Writer, p Post) error {
 	return err
 }
 
-func replaceExtraSpaces(text string) string {
+func ReplaceExtraSpaces(text string) string {
 	space := regexp.MustCompile(`\t+`)
 	textWithoutSpace := space.ReplaceAllString(text, "")
 	return textWithoutSpace

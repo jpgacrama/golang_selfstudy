@@ -17,6 +17,7 @@ func TestRender(t *testing.T) {
 	)
 
 	t.Run("Converts a single post into HTML", func(t *testing.T) {
+		t.Helper()
 		buf := bytes.Buffer{}
 		err := blogrenderer.Render(&buf, aPost)
 
@@ -32,6 +33,7 @@ func TestRender(t *testing.T) {
 	})
 
 	t.Run("it converts a single post into HTML", func(t *testing.T) {
+		t.Helper()
 		buf := bytes.Buffer{}
 		err := blogrenderer.Render(&buf, aPost)
 
@@ -43,7 +45,7 @@ func TestRender(t *testing.T) {
 		want := `<h1>hello world</h1>
 				<p>This is a description</p>
 				Tags: <ul><li>go</li><li>tdd</li></ul>`
-		want = blogrenderer.replaceExtraSpaces(want)
+		want = blogrenderer.ReplaceExtraSpaces(want)
 
 		if got != want {
 			t.Errorf("got '%s' want '%s'", got, want)
