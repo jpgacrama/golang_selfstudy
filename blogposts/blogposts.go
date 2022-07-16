@@ -17,9 +17,6 @@ type Post struct {
 	Body        string
 }
 
-type StubFailingFS struct {
-}
-
 const (
 	titleSeparator       = "Title: "
 	descriptionSeparator = "Description: "
@@ -76,8 +73,4 @@ func newPost(postBody io.Reader) (Post, error) {
 		Tags:        strings.Split(readMetaLine(scanner, tagsSeparator), ", "),
 		Body:        readBody(scanner),
 	}, nil
-}
-
-func (s StubFailingFS) Open(name string) (fs.File, error) {
-	return nil, errors.New("oh no, I always fail")
 }
