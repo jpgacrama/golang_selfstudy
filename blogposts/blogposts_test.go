@@ -19,9 +19,9 @@ func TestNewBlogPosts(t *testing.T) {
 					Description: Description 2
 					Tags: rust, borrow-checker
 					---
-					Hello 
-					L
-					M`
+					These are
+					three lines
+					of blogposts`
 	)
 
 	fs := fstest.MapFS{
@@ -31,13 +31,20 @@ func TestNewBlogPosts(t *testing.T) {
 	posts, err := NewPostsFromFS(fs)
 	assertDataIntegrityOfPosts(err, posts, t, fs)
 
-	// What about the second test case?
 	assertPost(t, posts[0], Post{
 		Title:       "Post 1",
 		Description: "Description 1",
 		Tags:        []string{"tdd", "go"},
 		Body: replaceExtraSpaces(`Hello
 								World`),
+	})
+	assertPost(t, posts[1], Post{
+		Title:       "Post 2",
+		Description: "Description 2",
+		Tags:        []string{"rust", "borrow-checker"},
+		Body: replaceExtraSpaces(`These are
+								three lines
+								of blogposts`),
 	})
 }
 
