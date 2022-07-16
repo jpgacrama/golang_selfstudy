@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"html/template"
 	"io"
 	"io/fs"
 	"regexp"
@@ -22,6 +23,12 @@ const (
 	descriptionSeparator = "Description: "
 	tagsSeparator        = "Tags: "
 	bodySeparator        = "---"
+)
+
+const (
+	postTemplate = `<h1>{{.Title}}</h1>
+					<p>{{.Description}}</p>
+					Tags: <ul>{{range .Tags}}<li>{{.}}</li>{{end}}</ul>`
 )
 
 func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
@@ -76,8 +83,16 @@ func newPost(postBody io.Reader) (Post, error) {
 }
 
 func Render(w io.Writer, p Post) error {
-	_, err := fmt.Fprintf(w, "<h1>%s</h1>", p.Title)
-	return err
+	templ, err := template.New("blog").Parse(ReplaceExtraSpaces(postTemplate))
+	if err != nil {
+		return err
+	}
+
+	if err := templ.Execute(w, p); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ReplaceExtraSpaces(text string) string {
