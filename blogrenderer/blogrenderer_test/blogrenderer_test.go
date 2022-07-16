@@ -45,11 +45,12 @@ func BenchmarkRender(b *testing.B) {
 		}
 	)
 
-	b.ResetTimer()
 	postRenderer, err := blogrenderer.NewPostRenderer()
+
 	if err != nil {
 		b.Fatal(err)
 	}
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		postRenderer.Render(io.Discard, aPost)
 	}
