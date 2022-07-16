@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"regexp"
 	"strings"
 )
 
@@ -72,4 +73,10 @@ func newPost(postBody io.Reader) (Post, error) {
 		Tags:        strings.Split(readMetaLine(scanner, tagsSeparator), ", "),
 		Body:        readBody(scanner),
 	}, nil
+}
+
+func replaceExtraSpaces(text string) string {
+	space := regexp.MustCompile(`\t+`)
+	textWithoutSpace := space.ReplaceAllString(text, "")
+	return textWithoutSpace
 }

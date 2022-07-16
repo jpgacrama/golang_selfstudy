@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"regexp"
 	"strings"
 )
 
@@ -77,4 +78,10 @@ func newPost(postBody io.Reader) (Post, error) {
 func Render(w io.Writer, p Post) error {
 	_, err := fmt.Fprintf(w, "<h1>%s</h1>", p.Title)
 	return err
+}
+
+func replaceExtraSpaces(text string) string {
+	space := regexp.MustCompile(`\t+`)
+	textWithoutSpace := space.ReplaceAllString(text, "")
+	return textWithoutSpace
 }
