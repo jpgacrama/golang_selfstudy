@@ -6,3 +6,7 @@
 .vscode/
 
 *.sum
+
+blogposts/__debug_bin
+
+*.exe
