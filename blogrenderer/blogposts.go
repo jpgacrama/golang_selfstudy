@@ -1,4 +1,4 @@
-package blogposts
+package blogrenderer
 
 import (
 	"bufio"
