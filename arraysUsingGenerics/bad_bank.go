@@ -1,4 +1,4 @@
-package arrays
+package arraysusinggenerics
 
 type Transaction struct {
 	From string

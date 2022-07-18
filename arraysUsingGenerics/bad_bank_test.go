@@ -1,4 +1,4 @@
-package arrays
+package arraysusinggenerics
 
 import "testing"
 

@@ -1,4 +1,4 @@
-package arrays
+package arraysusinggenerics
 
 func Find[A any](items []A, predicate func(A) bool) (value A, found bool) {
 	for _, v := range items {
@@ -9,7 +9,7 @@ func Find[A any](items []A, predicate func(A) bool) (value A, found bool) {
 	return
 }
 
-func Reduce[A, B any](collection []A, accumulator func(B, A) B, initialValue B) B {
+func Reduce[A any](collection []A, accumulator func(A, A) A, initialValue A) A {
 	var result = initialValue
 	for _, x := range collection {
 		result = accumulator(result, x)
