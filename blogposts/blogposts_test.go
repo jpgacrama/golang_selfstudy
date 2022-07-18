@@ -2,7 +2,6 @@ package blogposts
 
 import (
 	"reflect"
-	"regexp"
 	"testing"
 	"testing/fstest"
 )
@@ -64,10 +63,4 @@ func assertPost(t *testing.T, got Post, want Post) {
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %+v, want %+v", got, want)
 	}
-}
-
-func replaceExtraSpaces(text string) string {
-	space := regexp.MustCompile(`\t+`)
-	textWithoutSpace := space.ReplaceAllString(text, "")
-	return textWithoutSpace
 }

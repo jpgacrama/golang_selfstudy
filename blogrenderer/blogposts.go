@@ -1,9 +1,11 @@
-package blogposts
+package blogrenderer
 
 import (
 	"bufio"
 	"bytes"
+	"embed"
 	"fmt"
+	"html/template"
 	"io"
 	"io/fs"
 	"regexp"
@@ -17,11 +19,20 @@ type Post struct {
 	Body        string
 }
 
+type PostRenderer struct {
+	templ *template.Template
+}
+
 const (
 	titleSeparator       = "Title: "
 	descriptionSeparator = "Description: "
 	tagsSeparator        = "Tags: "
 	bodySeparator        = "---"
+)
+
+var (
+	//go:embed "templates/*"
+	postTemplates embed.FS
 )
 
 func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
@@ -75,7 +86,25 @@ func newPost(postBody io.Reader) (Post, error) {
 	}, nil
 }
 
-func replaceExtraSpaces(text string) string {
+func NewPostRenderer() (*PostRenderer, error) {
+	templ, err := template.ParseFS(postTemplates, "templates/*.gohtml")
+	if err != nil {
+		return nil, err
+	}
+
+	return &PostRenderer{templ: templ}, nil
+}
+
+func (r *PostRenderer) Render(w io.Writer, p Post) error {
+
+	if err := r.templ.Execute(w, p); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ReplaceExtraSpaces(text string) string {
 	space := regexp.MustCompile(`\t+`)
 	textWithoutSpace := space.ReplaceAllString(text, "")
 	return textWithoutSpace
