@@ -1,4 +1,4 @@
-package arrays
+package arraysusinggenerics
 
 func Sum(numbers []int) int {
 	add := func(acc, x int) int { return acc + x }
