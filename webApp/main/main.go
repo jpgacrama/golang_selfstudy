@@ -1,8 +1,9 @@
-package webApp
+package main
 
 import (
 	"log"
 	"net/http"
+	"webApp"
 )
 
 func main() {
