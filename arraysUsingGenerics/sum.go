@@ -1,5 +1,24 @@
 package arraysusinggenerics
 
+type Transaction struct {
+	From string
+	To   string
+	Sum  float64
+}
+
+func BalanceFor(transactions []Transaction, name string) float64 {
+	adjustBalance := func(currentBalance float64, t Transaction) float64 {
+		if t.From == name {
+			return currentBalance - t.Sum
+		}
+		if t.To == name {
+			return currentBalance + t.Sum
+		}
+		return currentBalance
+	}
+	return Reduce(transactions, adjustBalance, 0.0)
+}
+
 func Sum(numbers []int) int {
 	add := func(acc, x int) int { return acc + x }
 	return Reduce(numbers, add, 0)
@@ -28,7 +47,7 @@ func SumAllTails(numbers ...[]int) []int {
 	return Reduce(numbers, sumTail, []int{})
 }
 
-func Reduce[A any](collection []A, accumulator func(A, A) A, initialValue A) A {
+func Reduce[A, B any](collection []A, accumulator func(B, A) B, initialValue B) B {
 	var result = initialValue
 	for _, x := range collection {
 		result = accumulator(result, x)
