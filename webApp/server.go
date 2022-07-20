@@ -1,4 +1,4 @@
-package webApp
+package github.com/jpgacrama/golang_selfstudy/webApp
 
 import (
 	"fmt"
