@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golang_selfstudy/webApp/server"
+	"github.com/jpgacrama/golang_selfstudy/tree/webApp"
 	"log"
 	"net/http"
 )
