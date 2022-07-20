@@ -1,5 +1,10 @@
 package webApp
 
-func ListenAndServe(addr string, handler Handler) error
+import (
+	"fmt"
+	"net/http"
+)
 
-func PlayerServer() {}
+func PlayerServer(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "20")
+}
