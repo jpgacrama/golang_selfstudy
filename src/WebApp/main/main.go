@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/jpgacrama/golang_selfstudy/tree/webApp"
 	"log"
 	"net/http"
+	"webApp/server"
 )
 
 func main() {
