@@ -19,11 +19,12 @@ func TestGETPlayers(t *testing.T) {
 			"Floyd":  10,
 		},
 	}
-	server := &server.PlayerServer{&store}
+	server := server.PlayerServer{&store}
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := newGetScoreRequest("Pepper")
 		response := httptest.NewRecorder()
+
 		server.ServeHTTP(response, request)
 
 		assertResponseBody(t, response.Body.String(), "20")
