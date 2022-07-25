@@ -2,17 +2,13 @@ package server
 
 import (
 	"fmt"
+	"golang_selfstudy/webApp/playerstore"
 	"net/http"
 	"strings"
 )
 
-type PlayerStore interface {
-	GetPlayerScore(name string) int
-	RecordWin(name string)
-}
-
 type PlayerServer struct {
-	Store PlayerStore
+	Store playerstore.PlayerStore
 }
 
 func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {

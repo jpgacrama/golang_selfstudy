@@ -1,4 +1,4 @@
-package webApp
+package webApp_test
 
 import (
 	"fmt"
