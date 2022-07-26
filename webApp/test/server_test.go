@@ -1,9 +1,9 @@
 package webApp_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"golang_selfstudy/webApp/constants"
+	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/player"
 	"golang_selfstudy/webApp/server"
 	"io"
@@ -147,8 +147,7 @@ func (s *StubPlayerStore) GetLeague() []player.Player {
 
 func getLeagueFromResponse(t testing.TB, body io.Reader) (league []player.Player) {
 	t.Helper()
-	err := json.NewDecoder(body).Decode(&league)
-
+	league, err := filesystemstore.NewLeague(body)
 	if err != nil {
 		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", body, err)
 	}

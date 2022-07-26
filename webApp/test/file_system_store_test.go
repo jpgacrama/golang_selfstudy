@@ -1,8 +1,8 @@
 package webApp_test
 
 import (
+	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/player"
-	"golang_selfstudy/webApp/playerstore"
 	"strings"
 	"testing"
 )
@@ -13,7 +13,8 @@ func TestFileSystemStore(t *testing.T) {
             {"Name": "Cleo", "Wins": 10},
             {"Name": "Chris", "Wins": 33}]`)
 
-		store := playerstore.FileSystemPlayerStore{Database: database}
+		store := filesystemstore.FileSystemPlayerStore{}
+		store.SetDatabase(database)
 		got := store.GetLeague()
 		want := []player.Player{
 			{Name: "Cleo", Wins: 10},
