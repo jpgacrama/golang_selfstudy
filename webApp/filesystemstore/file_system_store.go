@@ -1,7 +1,7 @@
 package filesystemstore
 
 import (
-	"encoding/json"
+	"fmt"
 	"golang_selfstudy/webApp/player"
 	"io"
 )
@@ -16,6 +16,9 @@ func (f *FileSystemPlayerStore) SetDatabase(d io.Reader) {
 
 func (f *FileSystemPlayerStore) GetLeague() []player.Player {
 	var league []player.Player
-	json.NewDecoder(f.database).Decode(&league)
+	league, err := NewLeague(f.database)
+	if err != nil {
+		fmt.Println(fmt.Errorf("Unable to parse response from server %q into slice of Player, '%v'", league, err))
+	}
 	return league
 }
