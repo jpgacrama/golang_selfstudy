@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"golang_selfstudy/webApp/constants"
 	"golang_selfstudy/webApp/playerstore"
 	"net/http"
 	"strings"
@@ -26,7 +27,7 @@ func NewPlayerServer(store playerstore.PlayerStore) *PlayerServer {
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("content-type", constants.JsonContentType)
 	json.NewEncoder(w).Encode(p.store.GetLeague())
 }
 
