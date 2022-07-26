@@ -12,6 +12,7 @@ type PlayerServer struct {
 	router *http.ServeMux
 }
 
+// This is a Factory Pattern
 func NewPlayerServer(store playerstore.PlayerStore) *PlayerServer {
 	p := &PlayerServer{
 		store,
@@ -25,14 +26,7 @@ func NewPlayerServer(store playerstore.PlayerStore) *PlayerServer {
 }
 
 func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	router := http.NewServeMux()
-	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
-	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
-	router.ServeHTTP(w, r)
-}
-
-func (p *PlayerServer) SetStore(s playerstore.PlayerStore) {
-	p.store = s
+	p.router.ServeHTTP(w, r)
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
