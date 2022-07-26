@@ -148,5 +148,5 @@ func (s *StubPlayerStore) RecordWin(name string) {
 }
 
 func (s *StubPlayerStore) GetLeague() []player.Player {
-	return nil
+	return s.league
 }
