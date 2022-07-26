@@ -15,7 +15,6 @@ func (f *FileSystemPlayerStore) SetDatabase(d io.Reader) {
 }
 
 func (f *FileSystemPlayerStore) GetLeague() []player.Player {
-	var league []player.Player
 	league, err := NewLeague(f.database)
 	if err != nil {
 		fmt.Println(fmt.Errorf("Unable to parse response from server %q into slice of Player, '%v'", league, err))
