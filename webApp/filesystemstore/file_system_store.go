@@ -7,14 +7,15 @@ import (
 )
 
 type FileSystemPlayerStore struct {
-	database io.Reader
+	database io.ReadSeeker
 }
 
-func (f *FileSystemPlayerStore) SetDatabase(d io.Reader) {
+func (f *FileSystemPlayerStore) SetDatabase(d io.ReadSeeker) {
 	f.database = d
 }
 
 func (f *FileSystemPlayerStore) GetLeague() []player.Player {
+	f.database.Seek(0, 0)
 	league, err := NewLeague(f.database)
 	if err != nil {
 		fmt.Println(fmt.Errorf("Unable to parse response from server %q into slice of Player, '%v'", league, err))
