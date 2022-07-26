@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
-	server := &server.PlayerServer{Store: playerstore.NewInMemoryPlayerStore()}
+	server := &server.PlayerServer{}
+	server.SetStore(playerstore.NewInMemoryPlayerStore())
 	log.Fatal(http.ListenAndServe(":8080", server))
 }
