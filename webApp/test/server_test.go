@@ -7,12 +7,14 @@ import (
 	"golang_selfstudy/webApp/server"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
+	league   []player.Player
 }
 
 func TestGETPlayers(t *testing.T) {
@@ -21,6 +23,7 @@ func TestGETPlayers(t *testing.T) {
 			"Pepper": 20,
 			"Floyd":  10,
 		},
+		nil,
 		nil,
 	}
 	server := server.NewPlayerServer(&store)
@@ -58,6 +61,7 @@ func TestStoreWins(t *testing.T) {
 	store := StubPlayerStore{
 		map[string]int{},
 		nil,
+		nil,
 	}
 	server := server.NewPlayerServer(&store)
 
@@ -80,21 +84,33 @@ func TestStoreWins(t *testing.T) {
 }
 
 func TestLeague(t *testing.T) {
-	store := StubPlayerStore{}
-	server := server.NewPlayerServer(&store)
+	t.Run("it returns the league table as JSON", func(t *testing.T) {
+		wantedLeague := []player.Player{
+			{Name: "Cleo", Wins: 32},
+			{Name: "Chris", Wins: 20},
+			{Name: "Tiest", Wins: 14},
+		}
 
-	t.Run("it returns 200 on /league", func(t *testing.T) {
+		store := StubPlayerStore{nil, nil, wantedLeague}
+		server := server.NewPlayerServer(&store)
+
 		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
-		var got []player.Player
 
+		var got []player.Player
 		err := json.NewDecoder(response.Body).Decode(&got)
+
 		if err != nil {
 			t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", response.Body, err)
 		}
+
 		assertStatus(t, response.Code, http.StatusOK)
+
+		if !reflect.DeepEqual(got, wantedLeague) {
+			t.Errorf("got %v want %v", got, wantedLeague)
+		}
 	})
 }
 
@@ -129,4 +145,8 @@ func (s *StubPlayerStore) GetPlayerScore(name string) int {
 
 func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
+}
+
+func (s *StubPlayerStore) GetLeague() []player.Player {
+	return nil
 }

@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"golang_selfstudy/webApp/player"
 	"golang_selfstudy/webApp/playerstore"
 	"net/http"
 	"strings"
@@ -27,14 +26,8 @@ func NewPlayerServer(store playerstore.PlayerStore) *PlayerServer {
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(p.getLeagueTable())
+	json.NewEncoder(w).Encode(p.store.GetLeague())
 	w.WriteHeader(http.StatusOK)
-}
-
-func (p *PlayerServer) getLeagueTable() []player.Player {
-	return []player.Player{
-		{Name: "Chris", Wins: 20},
-	}
 }
 
 func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
