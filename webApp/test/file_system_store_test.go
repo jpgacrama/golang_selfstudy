@@ -31,10 +31,9 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 
-		store := filesystemstore.FileSystemPlayerStore{database}
-
+		store := filesystemstore.FileSystemPlayerStore{}
+		store.SetDatabase(database)
 		got := store.GetPlayerScore("Chris")
-
 		want := 33
 
 		if got != want {
