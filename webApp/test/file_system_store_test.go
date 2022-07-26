@@ -3,6 +3,9 @@ package webApp_test
 import (
 	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/player"
+	"io"
+	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -43,4 +46,20 @@ func assertScoreEquals(t testing.TB, got, want int) {
 	if got != want {
 		t.Errorf("got %d want %d", got, want)
 	}
+}
+
+func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
+	t.Helper()
+	tmpfile, err := ioutil.TempFile("", "db")
+	if err != nil {
+		t.Fatalf("could not create temp file %v", err)
+	}
+
+	tmpfile.Write([]byte(initialData))
+	removeFile := func() {
+		tmpfile.Close()
+		os.Remove(tmpfile.Name())
+	}
+
+	return tmpfile, removeFile
 }

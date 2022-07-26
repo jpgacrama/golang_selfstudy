@@ -7,10 +7,10 @@ import (
 )
 
 type FileSystemPlayerStore struct {
-	database io.ReadSeeker
+	database io.ReadWriteSeeker
 }
 
-func (f *FileSystemPlayerStore) SetDatabase(d io.ReadSeeker) {
+func (f *FileSystemPlayerStore) SetDatabase(d io.ReadWriteSeeker) {
 	f.database = d
 }
 
