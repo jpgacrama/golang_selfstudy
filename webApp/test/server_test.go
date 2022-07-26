@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang_selfstudy/webApp/player"
 	"golang_selfstudy/webApp/server"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -94,23 +95,14 @@ func TestLeague(t *testing.T) {
 		store := StubPlayerStore{nil, nil, wantedLeague}
 		server := server.NewPlayerServer(&store)
 
-		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
+		request := newLeagueRequest()
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 
-		var got []player.Player
-		err := json.NewDecoder(response.Body).Decode(&got)
-
-		if err != nil {
-			t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", response.Body, err)
-		}
-
+		got := getLeagueFromResponse(t, response.Body)
 		assertStatus(t, response.Code, http.StatusOK)
-
-		if !reflect.DeepEqual(got, wantedLeague) {
-			t.Errorf("got %v want %v", got, wantedLeague)
-		}
+		assertLeague(t, got, wantedLeague)
 	})
 }
 
@@ -149,4 +141,26 @@ func (s *StubPlayerStore) RecordWin(name string) {
 
 func (s *StubPlayerStore) GetLeague() []player.Player {
 	return s.league
+}
+
+func getLeagueFromResponse(t testing.TB, body io.Reader) (league []player.Player) {
+	t.Helper()
+	err := json.NewDecoder(body).Decode(&league)
+
+	if err != nil {
+		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", body, err)
+	}
+	return league
+}
+
+func assertLeague(t testing.TB, got, want []player.Player) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func newLeagueRequest() *http.Request {
+	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
+	return req
 }
