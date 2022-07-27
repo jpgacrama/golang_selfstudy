@@ -10,8 +10,17 @@ import (
 
 type FileSystemPlayerStore struct {
 	database io.ReadWriteSeeker
+	league   league.GroupOfPlayers
 }
 
+func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
+	database.Seek(0, 0)
+	league, _ := league.NewLeague(database)
+	return &FileSystemPlayerStore{
+		database: database,
+		league:   league,
+	}
+}
 func (f *FileSystemPlayerStore) SetDatabase(d io.ReadWriteSeeker) {
 	f.database = d
 }
