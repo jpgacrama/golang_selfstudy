@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang_selfstudy/webApp/league"
+	"golang_selfstudy/webApp/player"
 	"io"
 )
 
@@ -34,10 +35,12 @@ func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
 
 func (f *FileSystemPlayerStore) RecordWin(name string) {
 	league := f.GetLeague()
-	player := league.Find(name)
+	person := league.Find(name)
 
-	if player != nil {
-		player.Wins++
+	if person != nil {
+		person.Wins++
+	} else {
+		league = append(league, player.Player{Name: name, Wins: 1})
 	}
 
 	f.database.Seek(0, 0)

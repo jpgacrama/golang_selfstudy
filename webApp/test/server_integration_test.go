@@ -1,8 +1,8 @@
 package webApp_test
 
 import (
+	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/league"
-	"golang_selfstudy/webApp/playerstore"
 	"golang_selfstudy/webApp/server"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +10,10 @@ import (
 )
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
-	store := playerstore.NewInMemoryPlayerStore()
+	database, cleanDatabase := createTempFile(t, "")
+	defer cleanDatabase()
+	store := &filesystemstore.FileSystemPlayerStore{}
+	store.SetDatabase(database)
 	server := server.NewPlayerServer(store)
 	singlePlayer := "Pepper"
 
