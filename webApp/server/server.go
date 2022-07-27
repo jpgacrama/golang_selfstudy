@@ -4,18 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"golang_selfstudy/webApp/constants"
-	"golang_selfstudy/webApp/playerstore"
+	"golang_selfstudy/webApp/league"
 	"net/http"
 	"strings"
 )
 
 type PlayerServer struct {
-	store playerstore.PlayerStore
+	store PlayerStore
 	http.Handler
 }
 
+type PlayerStore interface {
+	GetPlayerScore(name string) int
+	RecordWin(name string)
+	GetLeague() league.GroupOfPlayers
+}
+
 // This is a Factory Pattern
-func NewPlayerServer(store playerstore.PlayerStore) *PlayerServer {
+func NewPlayerServer(store PlayerStore) *PlayerServer {
 	p := new(PlayerServer)
 	p.store = store
 	router := http.NewServeMux()

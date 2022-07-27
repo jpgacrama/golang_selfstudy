@@ -13,3 +13,5 @@ blogposts/__debug_bin
 
 .DS_Store
 WebApp/main/main
+
+WebApp/main/game.db.json
