@@ -6,15 +6,15 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 	"testing"
 )
 
 func TestFileSystemStore(t *testing.T) {
 	t.Run("league from a reader", func(t *testing.T) {
-		database := strings.NewReader(`[
+		database, cleanDatabase := createTempFile(t, `[
             {"Name": "Cleo", "Wins": 10},
             {"Name": "Chris", "Wins": 33}]`)
+		defer cleanDatabase()
 
 		store := filesystemstore.FileSystemPlayerStore{}
 		store.SetDatabase(database)
@@ -23,6 +23,7 @@ func TestFileSystemStore(t *testing.T) {
 			{Name: "Cleo", Wins: 10},
 			{Name: "Chris", Wins: 33},
 		}
+
 		assertLeague(t, got, want)
 
 		// read again
@@ -30,9 +31,10 @@ func TestFileSystemStore(t *testing.T) {
 		assertLeague(t, got, want)
 	})
 	t.Run("get player score", func(t *testing.T) {
-		database := strings.NewReader(`[
+		database, cleanDatabase := createTempFile(t, `[
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDatabase()
 
 		store := filesystemstore.FileSystemPlayerStore{}
 		store.SetDatabase(database)
@@ -43,11 +45,13 @@ func TestFileSystemStore(t *testing.T) {
 }
 
 func assertScoreEquals(t testing.TB, got, want int) {
+	t.Helper()
 	if got != want {
 		t.Errorf("got %d want %d", got, want)
 	}
 }
 
+// This is an Adapter pattern
 func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
 	t.Helper()
 	tmpfile, err := ioutil.TempFile("", "db")
