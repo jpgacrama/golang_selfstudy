@@ -2,7 +2,7 @@ package webApp_test
 
 import (
 	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/player"
+	"golang_selfstudy/webApp/league"
 	"io"
 	"io/ioutil"
 	"os"
@@ -19,7 +19,7 @@ func TestFileSystemStore(t *testing.T) {
 		store := filesystemstore.FileSystemPlayerStore{}
 		store.SetDatabase(database)
 		got := store.GetLeague()
-		want := []player.Player{
+		want := league.GroupOfPlayers{
 			{Name: "Cleo", Wins: 10},
 			{Name: "Chris", Wins: 33},
 		}
@@ -42,6 +42,19 @@ func TestFileSystemStore(t *testing.T) {
 		want := 33
 		assertScoreEquals(t, got, want)
 	})
+	t.Run("store wins for existing players", func(t *testing.T) {
+		database, cleanDatabase := createTempFile(t, `[
+			{"Name": "Cleo", "Wins": 10},
+			{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDatabase()
+		store := filesystemstore.FileSystemPlayerStore{}
+		store.SetDatabase(database)
+		store.RecordWin("Chris")
+
+		got := store.GetPlayerScore("Chris")
+		want := 34
+		assertScoreEquals(t, got, want)
+	})
 }
 
 func assertScoreEquals(t testing.TB, got, want int) {
@@ -51,7 +64,7 @@ func assertScoreEquals(t testing.TB, got, want int) {
 	}
 }
 
-// This is an Adapter pattern
+// This is an Adapter pattern. Call the function returned from this one to close the file safely
 func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
 	t.Helper()
 	tmpfile, err := ioutil.TempFile("", "db")

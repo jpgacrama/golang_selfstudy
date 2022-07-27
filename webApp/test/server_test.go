@@ -3,8 +3,7 @@ package webApp_test
 import (
 	"fmt"
 	"golang_selfstudy/webApp/constants"
-	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/player"
+	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/server"
 	"io"
 	"net/http"
@@ -16,7 +15,7 @@ import (
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
-	league   []player.Player
+	league   league.GroupOfPlayers
 }
 
 func TestGETPlayers(t *testing.T) {
@@ -87,7 +86,7 @@ func TestStoreWins(t *testing.T) {
 
 func TestLeague(t *testing.T) {
 	t.Run("it returns the league table as JSON", func(t *testing.T) {
-		wantedLeague := []player.Player{
+		wantedLeague := league.GroupOfPlayers{
 			{Name: "Cleo", Wins: 32},
 			{Name: "Chris", Wins: 20},
 			{Name: "Tiest", Wins: 14},
@@ -141,20 +140,20 @@ func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
 }
 
-func (s *StubPlayerStore) GetLeague() []player.Player {
+func (s *StubPlayerStore) GetLeague() league.GroupOfPlayers {
 	return s.league
 }
 
-func getLeagueFromResponse(t testing.TB, body io.Reader) (league []player.Player) {
+func getLeagueFromResponse(t testing.TB, body io.Reader) (l league.GroupOfPlayers) {
 	t.Helper()
-	league, err := filesystemstore.NewLeague(body)
+	newLeague, err := league.NewLeague(body)
 	if err != nil {
 		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", body, err)
 	}
-	return league
+	return newLeague
 }
 
-func assertLeague(t testing.TB, got, want []player.Player) {
+func assertLeague(t testing.TB, got, want league.GroupOfPlayers) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)

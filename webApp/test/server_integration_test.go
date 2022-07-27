@@ -1,7 +1,7 @@
 package webApp_test
 
 import (
-	"golang_selfstudy/webApp/player"
+	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/playerstore"
 	"golang_selfstudy/webApp/server"
 	"net/http"
@@ -32,7 +32,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusOK)
 
 		got := getLeagueFromResponse(t, response.Body)
-		want := []player.Player{
+		want := league.GroupOfPlayers{
 			{Name: "Pepper", Wins: 3},
 		}
 		assertLeague(t, got, want)
