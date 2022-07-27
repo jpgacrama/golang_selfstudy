@@ -2,7 +2,6 @@ package filesystemstore
 
 import (
 	"encoding/json"
-	"fmt"
 	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/player"
 	"io"
@@ -26,16 +25,11 @@ func (f *FileSystemPlayerStore) SetDatabase(d io.ReadWriteSeeker) {
 }
 
 func (f *FileSystemPlayerStore) GetLeague() league.GroupOfPlayers {
-	f.database.Seek(0, 0)
-	league, err := league.NewLeague(f.database)
-	if err != nil {
-		fmt.Println(fmt.Errorf("Unable to parse response from server %q into slice of Player, '%v'", league, err))
-	}
-	return league
+	return f.league
 }
 
 func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
-	player := f.GetLeague().Find(name)
+	player := f.league.Find(name)
 	if player != nil {
 		return player.Wins
 	}
@@ -43,15 +37,13 @@ func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
 }
 
 func (f *FileSystemPlayerStore) RecordWin(name string) {
-	league := f.GetLeague()
-	person := league.Find(name)
-
+	person := f.league.Find(name)
 	if person != nil {
 		person.Wins++
 	} else {
-		league = append(league, player.Player{Name: name, Wins: 1})
+		f.league = append(f.league, player.Player{Name: name, Wins: 1})
 	}
 
 	f.database.Seek(0, 0)
-	json.NewEncoder(f.database).Encode(league)
+	json.NewEncoder(f.database).Encode(f.league)
 }
