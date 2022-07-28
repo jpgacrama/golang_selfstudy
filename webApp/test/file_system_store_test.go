@@ -3,7 +3,6 @@ package webApp_test
 import (
 	"encoding/json"
 	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/player"
 	"io/ioutil"
 	"os"
@@ -11,30 +10,6 @@ import (
 )
 
 func TestFileSystemStore(t *testing.T) {
-	t.Run("league from a reader", func(t *testing.T) {
-		database, cleanDatabase := createTempFile(t, `[
-            {"Name": "Cleo", "Wins": 10},
-            {"Name": "Chris", "Wins": 33}]`)
-		defer cleanDatabase()
-
-		store, err := filesystemstore.NewFileSystemPlayerStore(database)
-		assertNoError(t, err)
-		tape := filesystemstore.Tape{}
-		tape.SetFile(database)
-		store.SetDatabase(json.NewEncoder(&tape))
-
-		got := store.GetLeague()
-		want := league.GroupOfPlayers{
-			{Name: "Cleo", Wins: 10},
-			{Name: "Chris", Wins: 33},
-		}
-
-		assertLeague(t, got, want)
-
-		// read again
-		got = store.GetLeague()
-		assertLeague(t, got, want)
-	})
 	t.Run("get player score", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
 			{"Name": "Cleo", "Wins": 10},
