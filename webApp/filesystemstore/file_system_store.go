@@ -5,6 +5,7 @@ import (
 	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/player"
 	"io"
+	"os"
 )
 
 type FileSystemPlayerStore struct {
@@ -12,20 +13,25 @@ type FileSystemPlayerStore struct {
 	league   league.GroupOfPlayers
 }
 
-type tape struct {
-	file io.ReadWriteSeeker
+type Tape struct {
+	file *os.File
 }
 
-func (t *tape) Write(p []byte) (n int, err error) {
+func (t *Tape) Write(p []byte) (n int, err error) {
+	t.file.Truncate(0)
 	t.file.Seek(0, 0)
 	return t.file.Write(p)
 }
 
-func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
+func (t *Tape) SetFile(f *os.File) {
+	t.file = f
+}
+
+func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
 	database.Seek(0, 0)
 	league, _ := league.NewLeague(database)
 	return &FileSystemPlayerStore{
-		database: &tape{file: database},
+		database: &Tape{file: database},
 		league:   league,
 	}
 }

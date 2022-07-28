@@ -3,7 +3,6 @@ package webApp_test
 import (
 	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/league"
-	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -79,7 +78,7 @@ func assertScoreEquals(t testing.TB, got, want int) {
 }
 
 // This is an Adapter pattern. Call the function returned from this one to close the file safely
-func createTempFile(t testing.TB, initialData string) (io.ReadWriteSeeker, func()) {
+func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	t.Helper()
 	tmpfile, err := ioutil.TempFile("", "db")
 	if err != nil {
