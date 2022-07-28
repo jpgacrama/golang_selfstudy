@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/league"
+	"golang_selfstudy/webApp/player"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -88,6 +89,26 @@ func TestFileSystemStore(t *testing.T) {
 		defer cleanDatabase()
 		_, err := filesystemstore.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
+	})
+	t.Run("league sorted", func(t *testing.T) {
+		database, cleanDatabase := createTempFile(t, `[
+			{"Name": "Cleo", "Wins": 10},
+			{"Name": "Chris", "Wins": 33}]`)
+		defer cleanDatabase()
+		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
+
+		got := store.GetLeague()
+		want := []player.Player{
+			{Name: "Chris", Wins: 33},
+			{Name: "Cleo", Wins: 10},
+		}
+
+		assertLeague(t, got, want)
+
+		// read again
+		got = store.GetLeague()
+		assertLeague(t, got, want)
 	})
 }
 
