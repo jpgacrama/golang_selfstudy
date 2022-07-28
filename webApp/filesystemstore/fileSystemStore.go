@@ -64,7 +64,7 @@ func (f *FileSystemPlayerStore) SetDatabase(d *json.Encoder) {
 }
 
 func (f *FileSystemPlayerStore) GetLeague() league.GroupOfPlayers {
-	sort.Slice(f.league, func(i, j int) bool {
+	sort.SliceStable(f.league, func(i, j int) bool {
 		return f.league[i].Wins > f.league[j].Wins
 	})
 	return f.league
