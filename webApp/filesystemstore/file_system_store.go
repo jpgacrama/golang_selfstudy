@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/player"
-	"io"
 	"os"
 )
 
 type FileSystemPlayerStore struct {
-	database io.Writer
+	database *json.Encoder
 	league   league.GroupOfPlayers
 }
 
@@ -27,16 +26,17 @@ func (t *Tape) SetFile(f *os.File) {
 	t.file = f
 }
 
-func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
-	database.Seek(0, 0)
-	league, _ := league.NewLeague(database)
+func NewFileSystemPlayerStore(file *os.File) *FileSystemPlayerStore {
+	file.Seek(0, 0)
+	league, _ := league.NewLeague(file)
+
 	return &FileSystemPlayerStore{
-		database: &Tape{file: database},
+		database: json.NewEncoder(&Tape{file}),
 		league:   league,
 	}
 }
 
-func (f *FileSystemPlayerStore) SetDatabase(d io.ReadWriteSeeker) {
+func (f *FileSystemPlayerStore) SetDatabase(d *json.Encoder) {
 	f.database = d
 }
 
@@ -59,6 +59,5 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 	} else {
 		f.league = append(f.league, player.Player{Name: name, Wins: 1})
 	}
-
-	json.NewEncoder(f.database).Encode(f.league)
+	f.database.Encode(f.league)
 }

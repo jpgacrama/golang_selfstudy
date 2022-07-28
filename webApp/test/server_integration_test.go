@@ -1,6 +1,7 @@
 package webApp_test
 
 import (
+	"encoding/json"
 	"golang_selfstudy/webApp/filesystemstore"
 	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/server"
@@ -13,7 +14,10 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	database, cleanDatabase := createTempFile(t, "")
 	defer cleanDatabase()
 	store := &filesystemstore.FileSystemPlayerStore{}
-	store.SetDatabase(database)
+	tape := filesystemstore.Tape{}
+	tape.SetFile(database)
+	store.SetDatabase(json.NewEncoder(&tape))
+
 	server := server.NewPlayerServer(store)
 	singlePlayer := "Pepper"
 

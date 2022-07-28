@@ -16,8 +16,9 @@ func main() {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
 
+	tape := filesystemstore.Tape{}
+	tape.SetFile(db)
 	store := filesystemstore.NewFileSystemPlayerStore(db)
-	store.SetDatabase(db)
 	server := server.NewPlayerServer(store)
 
 	if err := http.ListenAndServe(":8080", server); err != nil {
