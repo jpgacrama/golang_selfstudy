@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/player"
-	"golang_selfstudy/webApp/tapewriter"
 	"io"
 )
 
@@ -13,11 +12,20 @@ type FileSystemPlayerStore struct {
 	league   league.GroupOfPlayers
 }
 
+type tape struct {
+	file io.ReadWriteSeeker
+}
+
+func (t *tape) Write(p []byte) (n int, err error) {
+	t.file.Seek(0, 0)
+	return t.file.Write(p)
+}
+
 func NewFileSystemPlayerStore(database io.ReadWriteSeeker) *FileSystemPlayerStore {
 	database.Seek(0, 0)
 	league, _ := league.NewLeague(database)
 	return &FileSystemPlayerStore{
-		database: &tapewriter.SetFile(database),
+		database: &tape{file: database},
 		league:   league,
 	}
 }
