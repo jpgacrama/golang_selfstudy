@@ -18,7 +18,10 @@ func main() {
 
 	tape := filesystemstore.Tape{}
 	tape.SetFile(db)
-	store := filesystemstore.NewFileSystemPlayerStore(db)
+	store, err := filesystemstore.NewFileSystemPlayerStore(db)
+	if err != nil {
+		log.Fatalf("problem creating file system player store, %v ", err)
+	}
 	server := server.NewPlayerServer(store)
 
 	if err := http.ListenAndServe(":8080", server); err != nil {

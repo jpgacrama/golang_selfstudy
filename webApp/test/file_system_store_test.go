@@ -16,7 +16,8 @@ func TestFileSystemStore(t *testing.T) {
             {"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
 		tape := filesystemstore.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
@@ -39,7 +40,8 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
 		tape := filesystemstore.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
@@ -53,7 +55,8 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-		store := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
 		tape := filesystemstore.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
@@ -69,7 +72,8 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		assertNoError(t, err)
 		tape := filesystemstore.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
@@ -85,6 +89,13 @@ func assertScoreEquals(t testing.TB, got, want int) {
 	t.Helper()
 	if got != want {
 		t.Errorf("got %d want %d", got, want)
+	}
+}
+
+func assertNoError(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("didn't expect an error but got one, %v", err)
 	}
 }
 

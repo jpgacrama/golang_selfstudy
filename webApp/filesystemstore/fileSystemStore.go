@@ -2,6 +2,7 @@ package filesystemstore
 
 import (
 	"encoding/json"
+	"fmt"
 	"golang_selfstudy/webApp/league"
 	"golang_selfstudy/webApp/player"
 	"os"
@@ -26,14 +27,17 @@ func (t *Tape) SetFile(f *os.File) {
 	t.file = f
 }
 
-func NewFileSystemPlayerStore(file *os.File) *FileSystemPlayerStore {
+func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 	file.Seek(0, 0)
-	league, _ := league.NewLeague(file)
+	league, err := league.NewLeague(file)
+	if err != nil {
+		return nil, fmt.Errorf("problem loading player store from file %s, %v", file.Name(), err)
+	}
 
 	return &FileSystemPlayerStore{
 		database: json.NewEncoder(&Tape{file}),
 		league:   league,
-	}
+	}, nil
 }
 
 func (f *FileSystemPlayerStore) SetDatabase(d *json.Encoder) {
