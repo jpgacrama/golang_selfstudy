@@ -1,17 +1,15 @@
-package filesystemstore
+package poker
 
 import (
 	"encoding/json"
 	"fmt"
-	"golang_selfstudy/webApp/league"
-	"golang_selfstudy/webApp/player"
 	"os"
 	"sort"
 )
 
 type FileSystemPlayerStore struct {
 	database *json.Encoder
-	league   league.GroupOfPlayers
+	league   GroupOfPlayers
 }
 
 type Tape struct {
@@ -48,7 +46,7 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 		return nil, fmt.Errorf("problem initialising player db file, %v", err)
 	}
 
-	league, err := league.NewLeague(file)
+	league, err := NewLeague(file)
 	if err != nil {
 		return nil, fmt.Errorf("problem loading player store from file %s, %v", file.Name(), err)
 	}
@@ -63,7 +61,7 @@ func (f *FileSystemPlayerStore) SetDatabase(d *json.Encoder) {
 	f.database = d
 }
 
-func (f *FileSystemPlayerStore) GetLeague() league.GroupOfPlayers {
+func (f *FileSystemPlayerStore) GetLeague() GroupOfPlayers {
 	sort.SliceStable(f.league, func(i, j int) bool {
 		return f.league[i].Wins > f.league[j].Wins
 	})
@@ -83,7 +81,7 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 	if person != nil {
 		person.Wins++
 	} else {
-		f.league = append(f.league, player.Player{Name: name, Wins: 1})
+		f.league = append(f.league, Player{Name: name, Wins: 1})
 	}
 	f.database.Encode(f.league)
 }

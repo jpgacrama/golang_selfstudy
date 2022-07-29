@@ -2,8 +2,7 @@ package webApp_test
 
 import (
 	"encoding/json"
-	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/player"
+	"golang_selfstudy/webApp"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -16,9 +15,9 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
-		tape := filesystemstore.Tape{}
+		tape := poker.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
 
@@ -31,9 +30,9 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
-		tape := filesystemstore.Tape{}
+		tape := poker.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
 		store.RecordWin("Chris")
@@ -48,9 +47,9 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
 
-		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
-		tape := filesystemstore.Tape{}
+		tape := poker.Tape{}
 		tape.SetFile(database)
 		store.SetDatabase(json.NewEncoder(&tape))
 		store.RecordWin("Pepper")
@@ -62,7 +61,7 @@ func TestFileSystemStore(t *testing.T) {
 	t.Run("works with an empty file", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, "")
 		defer cleanDatabase()
-		_, err := filesystemstore.NewFileSystemPlayerStore(database)
+		_, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
 	})
 	t.Run("league sorted", func(t *testing.T) {
@@ -70,11 +69,11 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Cleo", "Wins": 10},
 			{"Name": "Chris", "Wins": 33}]`)
 		defer cleanDatabase()
-		store, err := filesystemstore.NewFileSystemPlayerStore(database)
+		store, err := poker.NewFileSystemPlayerStore(database)
 		assertNoError(t, err)
 
 		got := store.GetLeague()
-		want := []player.Player{
+		want := []poker.Player{
 			{Name: "Chris", Wins: 33},
 			{Name: "Cleo", Wins: 10},
 		}

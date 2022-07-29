@@ -1,15 +1,14 @@
-package league
+package poker
 
 import (
 	"encoding/json"
 	"fmt"
-	"golang_selfstudy/webApp/player"
 	"io"
 )
 
-type GroupOfPlayers []player.Player
+type GroupOfPlayers []Player
 
-func (l GroupOfPlayers) Find(name string) *player.Player {
+func (l GroupOfPlayers) Find(name string) *Player {
 	for i, p := range l {
 		if p.Name == name {
 			return &l[i]

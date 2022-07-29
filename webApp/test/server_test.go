@@ -2,9 +2,7 @@ package webApp_test
 
 import (
 	"fmt"
-	"golang_selfstudy/webApp/constants"
-	"golang_selfstudy/webApp/league"
-	"golang_selfstudy/webApp/server"
+	"golang_selfstudy/webApp"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +13,7 @@ import (
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
-	league   league.GroupOfPlayers
+	league   poker.GroupOfPlayers
 }
 
 func TestGETPlayers(t *testing.T) {
@@ -27,7 +25,7 @@ func TestGETPlayers(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := server.NewPlayerServer(&store)
+	server := poker.NewPlayerServer(&store)
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := newGetScoreRequest("Pepper")
@@ -64,7 +62,7 @@ func TestStoreWins(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := server.NewPlayerServer(&store)
+	server := poker.NewPlayerServer(&store)
 
 	t.Run("it records wins on POST", func(t *testing.T) {
 		player := "Pepper"
@@ -86,14 +84,14 @@ func TestStoreWins(t *testing.T) {
 
 func TestLeague(t *testing.T) {
 	t.Run("it returns the league table as JSON", func(t *testing.T) {
-		wantedLeague := league.GroupOfPlayers{
+		wantedLeague := poker.GroupOfPlayers{
 			{Name: "Cleo", Wins: 32},
 			{Name: "Chris", Wins: 20},
 			{Name: "Tiest", Wins: 14},
 		}
 
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server := server.NewPlayerServer(&store)
+		server := poker.NewPlayerServer(&store)
 
 		request := newLeagueRequest()
 		response := httptest.NewRecorder()
@@ -103,7 +101,7 @@ func TestLeague(t *testing.T) {
 		got := getLeagueFromResponse(t, response.Body)
 		assertStatus(t, response.Code, http.StatusOK)
 		assertLeague(t, got, wantedLeague)
-		assertContentType(t, response, constants.JsonContentType)
+		assertContentType(t, response, poker.JsonContentType)
 	})
 }
 
@@ -140,20 +138,20 @@ func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
 }
 
-func (s *StubPlayerStore) GetLeague() league.GroupOfPlayers {
+func (s *StubPlayerStore) GetLeague() poker.GroupOfPlayers {
 	return s.league
 }
 
-func getLeagueFromResponse(t testing.TB, body io.Reader) (l league.GroupOfPlayers) {
+func getLeagueFromResponse(t testing.TB, body io.Reader) (l poker.GroupOfPlayers) {
 	t.Helper()
-	newLeague, err := league.NewLeague(body)
+	newLeague, err := poker.NewLeague(body)
 	if err != nil {
 		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", body, err)
 	}
 	return newLeague
 }
 
-func assertLeague(t testing.TB, got, want league.GroupOfPlayers) {
+func assertLeague(t testing.TB, got, want poker.GroupOfPlayers) {
 	t.Helper()
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)

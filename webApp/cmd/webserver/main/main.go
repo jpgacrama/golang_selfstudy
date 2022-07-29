@@ -1,8 +1,7 @@
 package main
 
 import (
-	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/server"
+	"golang_selfstudy/webApp"
 	"log"
 	"net/http"
 	"os"
@@ -16,13 +15,13 @@ func main() {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
 
-	tape := filesystemstore.Tape{}
+	tape := poker.Tape{}
 	tape.SetFile(db)
-	store, err := filesystemstore.NewFileSystemPlayerStore(db)
+	store, err := poker.NewFileSystemPlayerStore(db)
 	if err != nil {
 		log.Fatalf("problem creating file system player store, %v ", err)
 	}
-	server := server.NewPlayerServer(store)
+	server := poker.NewPlayerServer(store)
 
 	if err := http.ListenAndServe(":8080", server); err != nil {
 		log.Fatalf("could not listen on port 8080 %v", err)

@@ -2,9 +2,7 @@ package webApp_test
 
 import (
 	"encoding/json"
-	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/league"
-	"golang_selfstudy/webApp/server"
+	"golang_selfstudy/webApp"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,12 +11,12 @@ import (
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	database, cleanDatabase := createTempFile(t, "")
 	defer cleanDatabase()
-	store := &filesystemstore.FileSystemPlayerStore{}
-	tape := filesystemstore.Tape{}
+	store := &poker.FileSystemPlayerStore{}
+	tape := poker.Tape{}
 	tape.SetFile(database)
 	store.SetDatabase(json.NewEncoder(&tape))
 
-	server := server.NewPlayerServer(store)
+	server := poker.NewPlayerServer(store)
 	singlePlayer := "Pepper"
 
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(singlePlayer))
@@ -39,7 +37,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 		assertStatus(t, response.Code, http.StatusOK)
 
 		got := getLeagueFromResponse(t, response.Body)
-		want := league.GroupOfPlayers{
+		want := poker.GroupOfPlayers{
 			{Name: "Pepper", Wins: 3},
 		}
 		assertLeague(t, got, want)
