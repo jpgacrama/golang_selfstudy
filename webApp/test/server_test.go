@@ -1,4 +1,4 @@
-package webApp_test
+package poker_test
 
 import (
 	"fmt"
