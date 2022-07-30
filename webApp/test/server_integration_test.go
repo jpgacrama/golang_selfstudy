@@ -1,47 +1,42 @@
-package webApp_test
+package poker_test
 
 import (
-	"encoding/json"
-	"golang_selfstudy/webApp/filesystemstore"
-	"golang_selfstudy/webApp/league"
-	"golang_selfstudy/webApp/server"
+	"golang_selfstudy/webApp"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
-	database, cleanDatabase := createTempFile(t, "")
+	database, cleanDatabase := CreateTempFile(t, "")
 	defer cleanDatabase()
-	store := &filesystemstore.FileSystemPlayerStore{}
-	tape := filesystemstore.Tape{}
-	tape.SetFile(database)
-	store.SetDatabase(json.NewEncoder(&tape))
+	store, err := poker.NewFileSystemPlayerStore(database)
+	AssertNoError(t, err)
 
-	server := server.NewPlayerServer(store)
+	server := poker.NewPlayerServer(store)
 	singlePlayer := "Pepper"
 
-	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(singlePlayer))
-	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(singlePlayer))
-	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(singlePlayer))
+	server.ServeHTTP(httptest.NewRecorder(), NewPostWinRequest(singlePlayer))
+	server.ServeHTTP(httptest.NewRecorder(), NewPostWinRequest(singlePlayer))
+	server.ServeHTTP(httptest.NewRecorder(), NewPostWinRequest(singlePlayer))
 
 	t.Run("get score", func(t *testing.T) {
 		response := httptest.NewRecorder()
-		server.ServeHTTP(response, newGetScoreRequest(singlePlayer))
-		assertStatus(t, response.Code, http.StatusOK)
+		server.ServeHTTP(response, NewGetScoreRequest(singlePlayer))
+		AssertStatus(t, response.Code, http.StatusOK)
 
-		assertResponseBody(t, response.Body.String(), "3")
+		AssertResponseBody(t, response.Body.String(), "3")
 	})
 
 	t.Run("get league", func(t *testing.T) {
 		response := httptest.NewRecorder()
-		server.ServeHTTP(response, newLeagueRequest())
-		assertStatus(t, response.Code, http.StatusOK)
+		server.ServeHTTP(response, NewLeagueRequest())
+		AssertStatus(t, response.Code, http.StatusOK)
 
-		got := getLeagueFromResponse(t, response.Body)
-		want := league.GroupOfPlayers{
+		got := GetLeagueFromResponse(t, response.Body)
+		want := poker.GroupOfPlayers{
 			{Name: "Pepper", Wins: 3},
 		}
-		assertLeague(t, got, want)
+		AssertLeague(t, got, want)
 	})
 }

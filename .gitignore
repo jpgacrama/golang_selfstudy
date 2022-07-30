@@ -15,3 +15,9 @@ blogposts/__debug_bin
 WebApp/main/main
 
 WebApp/main/game.db.json
+
+WebApp/cmd/webserver/main/game.db.json
+
+WebApp/cmd/webserver/main/main
+
+WebApp/cmd/cli/cli

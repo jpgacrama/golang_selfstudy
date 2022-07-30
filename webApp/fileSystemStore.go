@@ -1,17 +1,15 @@
-package filesystemstore
+package poker
 
 import (
 	"encoding/json"
 	"fmt"
-	"golang_selfstudy/webApp/league"
-	"golang_selfstudy/webApp/player"
 	"os"
 	"sort"
 )
 
 type FileSystemPlayerStore struct {
 	database *json.Encoder
-	league   league.GroupOfPlayers
+	league   GroupOfPlayers
 }
 
 type Tape struct {
@@ -22,10 +20,6 @@ func (t *Tape) Write(p []byte) (n int, err error) {
 	t.file.Truncate(0)
 	t.file.Seek(0, 0)
 	return t.file.Write(p)
-}
-
-func (t *Tape) SetFile(f *os.File) {
-	t.file = f
 }
 
 func initialisePlayerDBFile(file *os.File) error {
@@ -48,7 +42,7 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 		return nil, fmt.Errorf("problem initialising player db file, %v", err)
 	}
 
-	league, err := league.NewLeague(file)
+	league, err := NewLeague(file)
 	if err != nil {
 		return nil, fmt.Errorf("problem loading player store from file %s, %v", file.Name(), err)
 	}
@@ -59,11 +53,26 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 	}, nil
 }
 
-func (f *FileSystemPlayerStore) SetDatabase(d *json.Encoder) {
-	f.database = d
+func FileSystemPlayerStoreFromFile(path string) (*FileSystemPlayerStore, func(), error) {
+	db, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return nil, nil, fmt.Errorf("problem opening %s %v", path, err)
+	}
+
+	closeFunc := func() {
+		db.Close()
+	}
+
+	store, err := NewFileSystemPlayerStore(db)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("problem creating file system player store, %v ", err)
+	}
+
+	return store, closeFunc, nil
 }
 
-func (f *FileSystemPlayerStore) GetLeague() league.GroupOfPlayers {
+func (f *FileSystemPlayerStore) GetLeague() GroupOfPlayers {
 	sort.SliceStable(f.league, func(i, j int) bool {
 		return f.league[i].Wins > f.league[j].Wins
 	})
@@ -83,7 +92,7 @@ func (f *FileSystemPlayerStore) RecordWin(name string) {
 	if person != nil {
 		person.Wins++
 	} else {
-		f.league = append(f.league, player.Player{Name: name, Wins: 1})
+		f.league = append(f.league, Player{Name: name, Wins: 1})
 	}
 	f.database.Encode(f.league)
 }

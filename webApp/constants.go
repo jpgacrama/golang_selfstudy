@@ -1,3 +1,3 @@
-package constants
+package poker
 
 const JsonContentType = "application/json"

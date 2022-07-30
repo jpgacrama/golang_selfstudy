@@ -1,10 +1,8 @@
-package server
+package poker
 
 import (
 	"encoding/json"
 	"fmt"
-	"golang_selfstudy/webApp/constants"
-	"golang_selfstudy/webApp/league"
 	"net/http"
 	"strings"
 )
@@ -17,7 +15,7 @@ type PlayerServer struct {
 type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)
-	GetLeague() league.GroupOfPlayers
+	GetLeague() GroupOfPlayers
 }
 
 // This is a Factory Pattern
@@ -33,7 +31,7 @@ func NewPlayerServer(store PlayerStore) *PlayerServer {
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", constants.JsonContentType)
+	w.Header().Set("content-type", JsonContentType)
 	json.NewEncoder(w).Encode(p.store.GetLeague())
 }
 
