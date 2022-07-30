@@ -19,3 +19,5 @@ WebApp/main/game.db.json
 WebApp/cmd/webserver/main/game.db.json
 
 WebApp/cmd/webserver/main/main
+
+WebApp/cmd/cli/cli
