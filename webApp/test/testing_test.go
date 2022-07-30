@@ -42,6 +42,34 @@ func AssertNoError(t testing.TB, err error) {
 	}
 }
 
+func AssertStatus(t testing.TB, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("did not get correct status, got %d, want %d", got, want)
+	}
+}
+
+func AssertResponseBody(t testing.TB, got, want string) {
+	t.Helper()
+	if got != want {
+		t.Errorf("response body is wrong, got %q want %q", got, want)
+	}
+}
+
+func AssertLeague(t testing.TB, got, want poker.GroupOfPlayers) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func AssertContentType(t testing.TB, response *httptest.ResponseRecorder, want string) {
+	t.Helper()
+	if response.Result().Header.Get("content-type") != want {
+		t.Errorf("response did not have content-type of %s, got %v", want, response.Result().Header)
+	}
+}
+
 // This is an Adapter pattern. Call the function returned from this one to close the file safely
 func CreateTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	t.Helper()
@@ -59,13 +87,6 @@ func CreateTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	return tmpfile, removeFile
 }
 
-func AssertStatus(t testing.TB, got, want int) {
-	t.Helper()
-	if got != want {
-		t.Errorf("did not get correct status, got %d, want %d", got, want)
-	}
-}
-
 func NewGetScoreRequest(name string) *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", name), nil)
 	return req
@@ -76,11 +97,9 @@ func NewPostWinRequest(name string) *http.Request {
 	return req
 }
 
-func AssertResponseBody(t testing.TB, got, want string) {
-	t.Helper()
-	if got != want {
-		t.Errorf("response body is wrong, got %q want %q", got, want)
-	}
+func NewLeagueRequest() *http.Request {
+	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
+	return req
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
@@ -103,23 +122,4 @@ func GetLeagueFromResponse(t testing.TB, body io.Reader) (l poker.GroupOfPlayers
 		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", body, err)
 	}
 	return newLeague
-}
-
-func AssertLeague(t testing.TB, got, want poker.GroupOfPlayers) {
-	t.Helper()
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v want %v", got, want)
-	}
-}
-
-func AssertContentType(t testing.TB, response *httptest.ResponseRecorder, want string) {
-	t.Helper()
-	if response.Result().Header.Get("content-type") != want {
-		t.Errorf("response did not have content-type of %s, got %v", want, response.Result().Header)
-	}
-}
-
-func NewLeagueRequest() *http.Request {
-	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
-	return req
 }

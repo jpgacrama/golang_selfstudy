@@ -14,17 +14,23 @@ func main() {
 	fmt.Println("Type {Name} wins to record a win")
 
 	db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
-
-	if err != nil {
-		log.Fatalf("problem opening %s %v", dbFileName, err)
-	}
+	assertOpeningFileSuccessful(dbFileName, err)
 
 	store, err := poker.NewFileSystemPlayerStore(db)
-
-	if err != nil {
-		log.Fatalf("problem creating file system player store, %v ", err)
-	}
+	assertCreatingFileSystemPlayerStoreSuccessful(err)
 
 	game := poker.NewCLI(store, os.Stdin)
 	game.PlayPoker()
+}
+
+func assertOpeningFileSuccessful(fileName string, err error) {
+	if err != nil {
+		log.Fatalf("problem opening %s %v", fileName, err)
+	}
+}
+
+func assertCreatingFileSystemPlayerStoreSuccessful(err error) {
+	if err != nil {
+		log.Fatalf("problem creating file system player store, %v ", err)
+	}
 }

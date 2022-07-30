@@ -18,11 +18,16 @@ func NewCLI(store PlayerStore, in io.Reader) *CLI {
 	}
 }
 
-func (c *CLI) PlayPoker() {
-	c.in.Scan()
-	c.playerStore.RecordWin(extractWinner(c.in.Text()))
+func (cli *CLI) PlayPoker() {
+	userInput := cli.readLine()
+	cli.playerStore.RecordWin(extractWinner(userInput))
 }
 
 func extractWinner(userInput string) string {
 	return strings.Replace(userInput, " wins", "", 1)
+}
+
+func (cli *CLI) readLine() string {
+	cli.in.Scan()
+	return cli.in.Text()
 }
