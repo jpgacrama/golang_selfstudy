@@ -8,18 +8,19 @@ import (
 
 type CLI struct {
 	playerStore PlayerStore
-	in          io.Reader
+	in          *bufio.Scanner
 }
 
-func (cli *CLI) PlayPoker() {
-	reader := bufio.NewScanner(cli.in)
-	reader.Scan()
-	cli.playerStore.RecordWin(extractWinner(reader.Text()))
+func NewCLI(store PlayerStore, in io.Reader) *CLI {
+	return &CLI{
+		playerStore: store,
+		in:          bufio.NewScanner(in),
+	}
 }
 
-func (c *CLI) InitializeCLI(p PlayerStore, i io.Reader) {
-	c.playerStore = p
-	c.in = i
+func (c *CLI) PlayPoker() {
+	c.in.Scan()
+	c.playerStore.RecordWin(extractWinner(c.in.Text()))
 }
 
 func extractWinner(userInput string) string {
