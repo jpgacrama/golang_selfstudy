@@ -22,8 +22,10 @@ func (t *Tape) Write(p []byte) (n int, err error) {
 	return t.file.Write(p)
 }
 
-func (t *Tape) SetFile(f *os.File) {
-	t.file = f
+func NewTape(f *os.File) *Tape {
+	return &Tape{
+		file: f,
+	}
 }
 
 func initialisePlayerDBFile(file *os.File) error {

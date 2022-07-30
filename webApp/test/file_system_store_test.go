@@ -15,9 +15,8 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := poker.NewFileSystemPlayerStore(database)
 		AssertNoError(t, err)
-		tape := poker.Tape{}
-		tape.SetFile(database)
-		store.SetDatabase(json.NewEncoder(&tape))
+		tape := poker.NewTape(database)
+		store.SetDatabase(json.NewEncoder(tape))
 
 		got := store.GetPlayerScore("Chris")
 		want := 33
@@ -30,9 +29,8 @@ func TestFileSystemStore(t *testing.T) {
 		defer cleanDatabase()
 		store, err := poker.NewFileSystemPlayerStore(database)
 		AssertNoError(t, err)
-		tape := poker.Tape{}
-		tape.SetFile(database)
-		store.SetDatabase(json.NewEncoder(&tape))
+		tape := poker.NewTape(database)
+		store.SetDatabase(json.NewEncoder(tape))
 		store.RecordWin("Chris")
 
 		got := store.GetPlayerScore("Chris")
@@ -47,9 +45,8 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := poker.NewFileSystemPlayerStore(database)
 		AssertNoError(t, err)
-		tape := poker.Tape{}
-		tape.SetFile(database)
-		store.SetDatabase(json.NewEncoder(&tape))
+		tape := poker.NewTape(database)
+		store.SetDatabase(json.NewEncoder(tape))
 		store.RecordWin("Pepper")
 
 		got := store.GetPlayerScore("Pepper")

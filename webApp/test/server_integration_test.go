@@ -12,9 +12,8 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	database, cleanDatabase := CreateTempFile(t, "")
 	defer cleanDatabase()
 	store := &poker.FileSystemPlayerStore{}
-	tape := poker.Tape{}
-	tape.SetFile(database)
-	store.SetDatabase(json.NewEncoder(&tape))
+	tape := poker.NewTape(database)
+	store.SetDatabase(json.NewEncoder(tape))
 
 	server := poker.NewPlayerServer(store)
 	singlePlayer := "Pepper"

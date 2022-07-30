@@ -15,8 +15,6 @@ func main() {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
 
-	tape := poker.Tape{}
-	tape.SetFile(db)
 	store, err := poker.NewFileSystemPlayerStore(db)
 	if err != nil {
 		log.Fatalf("problem creating file system player store, %v ", err)

@@ -10,8 +10,7 @@ func TestTape_Write(t *testing.T) {
 	file, clean := CreateTempFile(t, "12345")
 	defer clean()
 
-	tape := poker.Tape{}
-	tape.SetFile(file)
+	tape := poker.NewTape(file)
 	tape.Write([]byte("abc"))
 
 	file.Seek(0, 0)
