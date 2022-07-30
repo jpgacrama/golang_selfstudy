@@ -25,4 +25,15 @@ func TestCLI(t *testing.T) {
 
 		AssertPlayerWin(t, playerStore, "Cleo")
 	})
+	t.Run("it schedules printing of blind values", func(t *testing.T) {
+		in := strings.NewReader("Chris wins\n")
+		playerStore := &StubPlayerStore{}
+		blindAlerter := &SpyBlindAlerter{}
+
+		cli := poker.NewCLI(playerStore, in, blindAlerter)
+		cli.PlayPoker()
+		if len(blindAlerter.alerts) != 1 {
+			t.Fatal("expected a blind alert to be scheduled")
+		}
+	})
 }
