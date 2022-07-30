@@ -1,7 +1,6 @@
 package poker_test
 
 import (
-	"encoding/json"
 	"golang_selfstudy/webApp"
 	"net/http"
 	"net/http/httptest"
@@ -11,9 +10,8 @@ import (
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	database, cleanDatabase := CreateTempFile(t, "")
 	defer cleanDatabase()
-	store := &poker.FileSystemPlayerStore{}
-	tape := poker.NewTape(database)
-	store.SetDatabase(json.NewEncoder(tape))
+	store, err := poker.NewFileSystemPlayerStore(database)
+	AssertNoError(t, err)
 
 	server := poker.NewPlayerServer(store)
 	singlePlayer := "Pepper"

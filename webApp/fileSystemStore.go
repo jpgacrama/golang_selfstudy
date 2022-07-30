@@ -22,12 +22,6 @@ func (t *Tape) Write(p []byte) (n int, err error) {
 	return t.file.Write(p)
 }
 
-func NewTape(f *os.File) *Tape {
-	return &Tape{
-		file: f,
-	}
-}
-
 func initialisePlayerDBFile(file *os.File) error {
 	file.Seek(0, 0)
 	info, err := file.Stat()
@@ -57,10 +51,6 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 		database: json.NewEncoder(&Tape{file}),
 		league:   league,
 	}, nil
-}
-
-func (f *FileSystemPlayerStore) SetDatabase(d *json.Encoder) {
-	f.database = d
 }
 
 func (f *FileSystemPlayerStore) GetLeague() GroupOfPlayers {
