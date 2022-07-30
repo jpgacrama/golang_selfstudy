@@ -7,20 +7,34 @@ import (
 )
 
 func TestCLI(t *testing.T) {
-	in := strings.NewReader("Chris wins\n")
-	playerStore := &StubPlayerStore{}
+	t.Run("record chris win from user input", func(t *testing.T) {
+		in := strings.NewReader("Chris wins\n")
+		playerStore := &StubPlayerStore{}
 
-	cli := &poker.CLI{}
-	cli.InitializeCLI(playerStore, in)
-	cli.PlayPoker()
+		cli := &poker.CLI{}
+		cli.InitializeCLI(playerStore, in)
+		cli.PlayPoker()
 
-	if len(playerStore.winCalls) != 1 {
-		t.Fatal("expected a win call but didn't get any")
+		assertPlayerWin(t, playerStore, "Chris")
+	})
+	t.Run("record cleo win from user input", func(t *testing.T) {
+		in := strings.NewReader("Cleo wins\n")
+		playerStore := &StubPlayerStore{}
+
+		cli := &poker.CLI{}
+		cli.InitializeCLI(playerStore, in)
+		cli.PlayPoker()
+
+		assertPlayerWin(t, playerStore, "Cleo")
+	})
+}
+
+func assertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
+	t.Helper()
+	if len(store.winCalls) != 1 {
+		t.Fatalf("got %d calls to RecordWin want %d", len(store.winCalls), 1)
 	}
-
-	got := playerStore.winCalls[0]
-	want := "Chris"
-	if got != want {
-		t.Errorf("didn't record correct winner, got %q, want %q", got, want)
+	if store.winCalls[0] != winner {
+		t.Errorf("did not store correct winner got %q want %q", store.winCalls[0], winner)
 	}
 }
