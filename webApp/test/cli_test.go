@@ -67,7 +67,7 @@ func TestCLI(t *testing.T) {
 					t.Errorf("got amount %d, want %d", amountGot, c.expectedAmount)
 				}
 
-				gotScheduledTime := alert.GetScheduledAt()
+				gotScheduledTime := alert.GetScheduledAlertAt()
 				if gotScheduledTime != c.expectedScheduleTime {
 					t.Errorf("got scheduled time of %v, want %v", gotScheduledTime, c.expectedScheduleTime)
 				}
