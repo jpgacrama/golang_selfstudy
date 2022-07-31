@@ -18,5 +18,6 @@ func main() {
 
 	fmt.Println("Let's play poker")
 	fmt.Println("Type {Name} wins to record a win")
-	poker.NewCLI(store, os.Stdin).PlayPoker()
+	var dummy = &poker.SpyBlindAlerter{}
+	poker.NewCLI(store, os.Stdin, dummy).PlayPoker()
 }
