@@ -18,13 +18,10 @@ type StubPlayerStore struct {
 	league   []poker.Player
 }
 
-func AssertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
+func AssertPlayerWin(t testing.TB, game *poker.Game, winner string) {
 	t.Helper()
-	if len(store.winCalls) != 1 {
-		t.Fatalf("got %d calls to RecordWin want %d", len(store.winCalls), 1)
-	}
-	if store.winCalls[0] != winner {
-		t.Errorf("did not store correct winner got %q want %q", store.winCalls[0], winner)
+	if game.GetStore().GetLeague().Find(winner) == nil {
+		t.Errorf("did not store correct winner: got: %v, want: %v", game.GetStore().GetLeague().Find(winner), winner)
 	}
 }
 

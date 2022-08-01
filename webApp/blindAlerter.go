@@ -8,6 +8,7 @@ import (
 
 type BlindAlerter interface {
 	ScheduleAlertAt(duration time.Duration, amount int)
+	GetAlerts() []ScheduledAlert
 }
 
 type BlindAlerterFunc func(duration time.Duration, amount int)
