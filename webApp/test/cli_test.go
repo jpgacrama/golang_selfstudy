@@ -110,7 +110,11 @@ func TestCLI(t *testing.T) {
 
 func assertScheduledAlert(t *testing.T, got poker.ScheduledAlert, want wantScheduledAlert) {
 	t.Helper()
-	if (got.GetAmount() != want.amount) && (got.GetScheduledAlertAt() != want.at) {
-		t.Errorf("got: %v, want: %v", got, want)
+	if got.GetAmount() != want.amount {
+		t.Errorf("Amount NOT the same got: %v, want: %v", got, want)
+	}
+
+	if got.GetScheduledAlertAt() != want.at {
+		t.Errorf("Scheduled At NOT the same got: %v, want: %v", got, want)
 	}
 }
