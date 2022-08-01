@@ -16,7 +16,7 @@ type wantScheduledAlert struct {
 
 func TestCLI(t *testing.T) {
 	t.Run("record chris win from user input", func(t *testing.T) {
-		in := strings.NewReader("Chris wins\n")
+		in := strings.NewReader("5\nChris wins\n")
 		playerStore := &StubPlayerStore{}
 
 		var dummySpyAlerter = &poker.SpyBlindAlerter{}
@@ -27,7 +27,7 @@ func TestCLI(t *testing.T) {
 		AssertPlayerWin(t, playerStore, "Chris")
 	})
 	t.Run("record cleo win from user input", func(t *testing.T) {
-		in := strings.NewReader("Cleo wins\n")
+		in := strings.NewReader("5\nCleo wins\n")
 		playerStore := &StubPlayerStore{}
 
 		var dummySpyAlerter = &poker.SpyBlindAlerter{}
@@ -38,7 +38,7 @@ func TestCLI(t *testing.T) {
 		AssertPlayerWin(t, playerStore, "Cleo")
 	})
 	t.Run("it schedules printing of blind values", func(t *testing.T) {
-		in := strings.NewReader("Chris wins\n")
+		in := strings.NewReader("5\nChris wins\n")
 		playerStore := &StubPlayerStore{}
 		blindAlerter := &poker.SpyBlindAlerter{}
 		var dummyStdOut = &bytes.Buffer{}
