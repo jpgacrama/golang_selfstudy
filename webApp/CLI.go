@@ -14,7 +14,7 @@ type CLI struct {
 }
 
 type BlindAlerter interface {
-	ScheduleAlertAt(duration time.Duration, amount int)
+	AddScheduleAlert(duration time.Duration, amount int)
 }
 
 func NewCLI(store PlayerStore, in io.Reader, alerter BlindAlerter) *CLI {
@@ -35,7 +35,7 @@ func (cli *CLI) scheduleBlindAlerts() {
 	blinds := []int{100, 200, 300, 400, 500, 600, 800, 1000, 2000, 4000, 8000}
 	blindTime := 0 * time.Second
 	for _, blind := range blinds {
-		cli.alerter.ScheduleAlertAt(blindTime, blind)
+		cli.alerter.AddScheduleAlert(blindTime, blind)
 		blindTime = blindTime + 10*time.Minute
 	}
 }
