@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"golang_selfstudy/webApp"
 	"log"
@@ -18,6 +19,6 @@ func main() {
 
 	fmt.Println("Let's play poker")
 	fmt.Println("Type {Name} wins to record a win")
-	var dummy = &poker.SpyBlindAlerter{}
-	poker.NewCLI(store, os.Stdin, dummy).PlayPoker()
+	var dummyStdOut = &bytes.Buffer{}
+	poker.NewCLI(store, os.Stdin, dummyStdOut, poker.BlindAlerterFunc(poker.StdOutAlerter)).PlayPoker()
 }
