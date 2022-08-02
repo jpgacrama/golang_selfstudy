@@ -16,6 +16,7 @@ type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWin(name string)
 	GetLeague() GroupOfPlayers
+	GetWinnerList() []string
 }
 
 // This is a Factory Pattern
