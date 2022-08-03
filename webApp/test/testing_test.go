@@ -19,7 +19,7 @@ type StubPlayerStore struct {
 	league  []poker.Player
 }
 
-func AssertPlayerWin(t testing.TB, game *poker.Game, winner string) {
+func AssertPlayerWin(t testing.TB, game *poker.TexasHoldem, winner string) {
 	t.Helper()
 	winnersList := game.GetStore().GetWinnerList()
 	gotWinner := sort.SearchStrings(winnersList, winner)

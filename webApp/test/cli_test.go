@@ -43,17 +43,17 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 
 		cases := []poker.ScheduledAlert{
-			{0 * time.Second, 100},
-			{10 * time.Minute, 200},
-			{20 * time.Minute, 300},
-			{30 * time.Minute, 400},
-			{40 * time.Minute, 500},
-			{50 * time.Minute, 600},
-			{60 * time.Minute, 800},
-			{70 * time.Minute, 1000},
-			{80 * time.Minute, 2000},
-			{90 * time.Minute, 4000},
-			{100 * time.Minute, 8000},
+			{At: 0 * time.Second, Amount: 100},
+			{At: 10 * time.Minute, Amount: 200},
+			{At: 20 * time.Minute, Amount: 300},
+			{At: 30 * time.Minute, Amount: 400},
+			{At: 40 * time.Minute, Amount: 500},
+			{At: 50 * time.Minute, Amount: 600},
+			{At: 60 * time.Minute, Amount: 800},
+			{At: 70 * time.Minute, Amount: 1000},
+			{At: 80 * time.Minute, Amount: 2000},
+			{At: 90 * time.Minute, Amount: 4000},
+			{At: 100 * time.Minute, Amount: 8000},
 		}
 
 		for i, want := range cases {
@@ -87,10 +87,10 @@ func TestCLI(t *testing.T) {
 		}
 
 		cases := []poker.ScheduledAlert{
-			{0 * time.Second, 100},
-			{12 * time.Minute, 200},
-			{24 * time.Minute, 300},
-			{36 * time.Minute, 400},
+			{At: 0 * time.Second, Amount: 100},
+			{At: 12 * time.Minute, Amount: 200},
+			{At: 24 * time.Minute, Amount: 300},
+			{At: 36 * time.Minute, Amount: 400},
 		}
 
 		for i, want := range cases {
@@ -166,4 +166,8 @@ func assertScheduledAlert(t *testing.T, got poker.ScheduledAlert, want poker.Sch
 	if got.GetScheduledAlertAt() != want.At {
 		t.Errorf("Scheduled At NOT the same got: %v, want: %v", got, want)
 	}
+}
+
+func checkSchedulingCases(cases []poker.ScheduledAlert, t *testing.T, blindAlerter *poker.SpyBlindAlerter) {
+	fmt.Println("This function is not yet implemented")
 }
