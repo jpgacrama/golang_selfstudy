@@ -6,8 +6,8 @@ import (
 )
 
 type ScheduledAlert struct {
-	at     time.Duration
-	amount int
+	At     time.Duration
+	Amount int
 }
 type SpyBlindAlerter struct {
 	alerts []ScheduledAlert
@@ -22,13 +22,13 @@ func (s *SpyBlindAlerter) GetAlerts() []ScheduledAlert {
 }
 
 func (a *ScheduledAlert) GetScheduledAlertAt() time.Duration {
-	return a.at
+	return a.At
 }
 
 func (a *ScheduledAlert) GetAmount() int {
-	return a.amount
+	return a.Amount
 }
 
 func (s ScheduledAlert) String() string {
-	return fmt.Sprintf("%d chips at %v", s.amount, s.at)
+	return fmt.Sprintf("%d chips at %v", s.Amount, s.At)
 }

@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-type wantScheduledAlert struct {
-	at     time.Duration
-	amount int
-}
-
 func TestCLI(t *testing.T) {
 	t.Run("record chris win from user input", func(t *testing.T) {
 		stdout := &bytes.Buffer{}
@@ -47,7 +42,7 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, dummyStdOut, game)
 		cli.PlayPoker()
 
-		cases := []wantScheduledAlert{
+		cases := []poker.ScheduledAlert{
 			{0 * time.Second, 100},
 			{10 * time.Minute, 200},
 			{20 * time.Minute, 300},
@@ -91,7 +86,7 @@ func TestCLI(t *testing.T) {
 			t.Errorf("got %q, want %q", got, want)
 		}
 
-		cases := []wantScheduledAlert{
+		cases := []poker.ScheduledAlert{
 			{0 * time.Second, 100},
 			{12 * time.Minute, 200},
 			{24 * time.Minute, 300},
@@ -111,13 +106,64 @@ func TestCLI(t *testing.T) {
 	})
 }
 
-func assertScheduledAlert(t *testing.T, got poker.ScheduledAlert, want wantScheduledAlert) {
+func TestGame_Start(t *testing.T) {
+	t.Run("schedules alerts on game start for 5 players", func(t *testing.T) {
+		blindAlerter := &poker.SpyBlindAlerter{}
+		dummyPlayerStore := &StubPlayerStore{}
+		game := poker.NewGame(blindAlerter, dummyPlayerStore)
+		game.Start(5)
+
+		cases := []poker.ScheduledAlert{
+			{At: 0 * time.Second, Amount: 100},
+			{At: 10 * time.Minute, Amount: 200},
+			{At: 20 * time.Minute, Amount: 300},
+			{At: 30 * time.Minute, Amount: 400},
+			{At: 40 * time.Minute, Amount: 500},
+			{At: 50 * time.Minute, Amount: 600},
+			{At: 60 * time.Minute, Amount: 800},
+			{At: 70 * time.Minute, Amount: 1000},
+			{At: 80 * time.Minute, Amount: 2000},
+			{At: 90 * time.Minute, Amount: 4000},
+			{At: 100 * time.Minute, Amount: 8000},
+		}
+
+		checkSchedulingCases(cases, t, blindAlerter)
+	})
+	t.Run("schedules alerts on game start for 7 players", func(t *testing.T) {
+		blindAlerter := &poker.SpyBlindAlerter{}
+		dummyPlayerStore := &StubPlayerStore{}
+		game := poker.NewGame(blindAlerter, dummyPlayerStore)
+
+		game.Start(7)
+
+		cases := []poker.ScheduledAlert{
+			{At: 0 * time.Second, Amount: 100},
+			{At: 12 * time.Minute, Amount: 200},
+			{At: 24 * time.Minute, Amount: 300},
+			{At: 36 * time.Minute, Amount: 400},
+		}
+
+		checkSchedulingCases(cases, t, blindAlerter)
+	})
+}
+
+func TestGame_Finish(t *testing.T) {
+	store := &StubPlayerStore{}
+	dummyBlindAlerter := &poker.SpyBlindAlerter{}
+	game := poker.NewGame(dummyBlindAlerter, store)
+	winner := "Ruth"
+
+	game.Finish(winner)
+	AssertPlayerWin(t, game, winner)
+}
+
+func assertScheduledAlert(t *testing.T, got poker.ScheduledAlert, want poker.ScheduledAlert) {
 	t.Helper()
-	if got.GetAmount() != want.amount {
+	if got.GetAmount() != want.Amount {
 		t.Errorf("Amount NOT the same got: %v, want: %v", got, want)
 	}
 
-	if got.GetScheduledAlertAt() != want.at {
+	if got.GetScheduledAlertAt() != want.At {
 		t.Errorf("Scheduled At NOT the same got: %v, want: %v", got, want)
 	}
 }
