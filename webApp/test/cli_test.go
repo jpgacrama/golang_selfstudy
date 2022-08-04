@@ -60,9 +60,7 @@ func TestCLI(t *testing.T) {
 			t.Run(fmt.Sprint(want), func(t *testing.T) {
 
 				alerts := game.GetBlindAlerter().GetAlerts()
-				if len(alerts) <= i {
-					t.Fatalf("alert %d was not scheduled %v", i, alerts)
-				}
+				assertAlertWasScheduled(t, alerts, i)
 
 				got := alerts[i]
 				assertScheduledAlert(t, got, want)
@@ -90,13 +88,11 @@ func TestCLI(t *testing.T) {
 			{At: 36 * time.Minute, Amount: 400},
 		}
 
+		alerts := blindAlerter.GetAlerts()
 		for i, want := range cases {
 			t.Run(fmt.Sprint(want), func(t *testing.T) {
-				if len(blindAlerter.GetAlerts()) <= i {
-					t.Fatalf("alert %d was not scheduled %v", i, blindAlerter.GetAlerts())
-				}
-
-				got := blindAlerter.GetAlerts()[i]
+				assertAlertWasScheduled(t, alerts, i)
+				got := alerts[i]
 				assertScheduledAlert(t, got, want)
 			})
 		}
@@ -207,5 +203,12 @@ func assertMessagesSentToUser(t testing.TB, obtained *bytes.Buffer, messages ...
 	got := obtained.String()
 	if got != want {
 		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
+	}
+}
+
+func assertAlertWasScheduled(t testing.TB, alerts []poker.ScheduledAlert, i int) {
+	t.Helper()
+	if len(alerts) <= i {
+		t.Fatalf("alert %d was not scheduled %v", i, alerts)
 	}
 }
