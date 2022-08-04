@@ -2,7 +2,7 @@ package poker_test
 
 import (
 	"bytes"
-	"fmt"
+	"github.com/google/go-cmp/cmp"
 	"golang_selfstudy/webApp"
 	"strings"
 	"testing"
@@ -69,23 +69,7 @@ func TestGame_Start(t *testing.T) {
 			{At: 100 * time.Minute, Amount: 8000},
 		}
 
-		checkSchedulingCases(cases, t, blindAlerter)
-	})
-	t.Run("schedules alerts on game start for 7 players", func(t *testing.T) {
-		blindAlerter := &poker.SpyBlindAlerter{}
-		dummyPlayerStore := &StubPlayerStore{}
-		game := poker.NewGame(blindAlerter, dummyPlayerStore)
-
-		game.Start(7)
-
-		cases := []poker.ScheduledAlert{
-			{At: 0 * time.Second, Amount: 100},
-			{At: 12 * time.Minute, Amount: 200},
-			{At: 24 * time.Minute, Amount: 300},
-			{At: 36 * time.Minute, Amount: 400},
-		}
-
-		checkSchedulingCases(cases, t, blindAlerter)
+		checkSchedulingCases(t, cases, blindAlerter)
 	})
 }
 
@@ -99,8 +83,13 @@ func TestGame_Finish(t *testing.T) {
 	AssertPlayerWin(t, game, winner)
 }
 
-func checkSchedulingCases(cases []poker.ScheduledAlert, t *testing.T, blindAlerter *poker.SpyBlindAlerter) {
-	fmt.Println("This function is not yet implemented")
+func checkSchedulingCases(t *testing.T, cases []poker.ScheduledAlert, blindAlerter *poker.SpyBlindAlerter) {
+	t.Helper()
+	gotAlerts := blindAlerter.GetAlerts()
+	isEqual := cmp.Equal(cases, gotAlerts)
+	if !isEqual {
+		t.Errorf("%v is not the same as %v", cases, gotAlerts)
+	}
 }
 
 func assertMessagesSentToUser(t testing.TB, obtained *bytes.Buffer, messages ...string) {
