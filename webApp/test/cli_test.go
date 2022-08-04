@@ -79,13 +79,10 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, stdout, game)
 		cli.PlayPoker()
 
-		got := stdout.String()
+		got := stdout
 		want := poker.PlayerPrompt
 
-		if got != want {
-			t.Errorf("got %q, want %q", got, want)
-		}
-
+		assertMessagesSentToUser(t, got, want)
 		cases := []poker.ScheduledAlert{
 			{At: 0 * time.Second, Amount: 100},
 			{At: 12 * time.Minute, Amount: 200},
@@ -112,12 +109,10 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, stdout, game)
 		cli.PlayPoker()
 
-		gotPrompt := stdout.String()
+		gotPrompt := stdout
 		wantPrompt := poker.PlayerPrompt
+		assertMessagesSentToUser(t, gotPrompt, wantPrompt)
 
-		if gotPrompt != wantPrompt {
-			t.Errorf("got %q, want %q", gotPrompt, wantPrompt)
-		}
 		if game.StartedWith != 7 {
 			t.Errorf("wanted Start called with 7 but got %d", game.StartedWith)
 		}
@@ -133,12 +128,9 @@ func TestCLI(t *testing.T) {
 			t.Errorf("game should not have started")
 		}
 
-		gotPrompt := stdout.String()
-		wantPrompt := poker.PlayerPrompt + "you're so silly"
-
-		if gotPrompt != wantPrompt {
-			t.Errorf("got %q, want %q", gotPrompt, wantPrompt)
-		}
+		gotPrompt := stdout
+		wantPrompt := poker.PlayerPrompt + poker.BadPlayerInputErrMsg
+		assertMessagesSentToUser(t, gotPrompt, wantPrompt)
 	})
 
 }
@@ -207,4 +199,13 @@ func assertScheduledAlert(t *testing.T, got poker.ScheduledAlert, want poker.Sch
 
 func checkSchedulingCases(cases []poker.ScheduledAlert, t *testing.T, blindAlerter *poker.SpyBlindAlerter) {
 	fmt.Println("This function is not yet implemented")
+}
+
+func assertMessagesSentToUser(t testing.TB, obtained *bytes.Buffer, messages ...string) {
+	t.Helper()
+	want := strings.Join(messages, "")
+	got := obtained.String()
+	if got != want {
+		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
+	}
 }
