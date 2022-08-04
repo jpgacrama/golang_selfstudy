@@ -14,12 +14,9 @@ func TestCLI(t *testing.T) {
 	t.Run("start game with 3 players and finish game with 'Chris' as winner", func(t *testing.T) {
 		game := &poker.GameSpy{}
 		stdout := &bytes.Buffer{}
-
 		in := userSends("3", "Chris wins")
 		cli := poker.NewCLI(in, stdout, game)
-
 		cli.PlayPoker()
-
 		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
 		assertGameStartedWith(t, game, 3)
 		assertFinishCalledWith(t, game, "Chris")
@@ -29,7 +26,6 @@ func TestCLI(t *testing.T) {
 		in := userSends("8", "Cleo wins")
 		dummyStdOut := &bytes.Buffer{}
 		cli := poker.NewCLI(in, dummyStdOut, game)
-
 		cli.PlayPoker()
 		assertGameStartedWith(t, game, 8)
 		assertFinishCalledWith(t, game, "Cleo")
@@ -37,10 +33,8 @@ func TestCLI(t *testing.T) {
 
 	t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
 		game := &poker.GameSpy{}
-
 		stdout := &bytes.Buffer{}
 		in := userSends("pies")
-
 		cli := poker.NewCLI(in, stdout, game)
 		cli.PlayPoker()
 		assertGameNotStarted(t, game)
@@ -78,7 +72,6 @@ func TestGame_Finish(t *testing.T) {
 	dummyBlindAlerter := &poker.SpyBlindAlerter{}
 	game := poker.NewGame(dummyBlindAlerter, store)
 	winner := "Ruth"
-
 	game.Finish(winner)
 	AssertPlayerWin(t, game, winner)
 }
