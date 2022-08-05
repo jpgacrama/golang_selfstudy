@@ -1,9 +1,8 @@
 # golang_selfstudy
-README.md
 
-To fix problems involving _<package> is not in GOROOT_:
+##To fix problems involving _<package> is not in GOROOT_:
 
-#GOPATH MUST BE OUTSIDE OF GOROOT directory!!!
+_GOPATH MUST BE OUTSIDE OF GOROOT directory!!!_
 export GOPATH=/mnt/sda1/programming/gopath
 export PATH=$PATH:$GOPATH/bin
 
