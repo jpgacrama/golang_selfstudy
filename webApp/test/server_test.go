@@ -18,11 +18,7 @@ func TestGETPlayers(t *testing.T) {
 		nil,
 		nil,
 	}
-	server, err := poker.NewPlayerServer(&store)
-	if err != nil {
-		t.Fatalf("cannot create NewPlayerServer")
-	}
-
+	server := mustMakePlayerServer(t, &store)
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := NewGetScoreRequest("Pepper")
 		response := httptest.NewRecorder()
@@ -58,11 +54,7 @@ func TestStoreWins(t *testing.T) {
 		nil,
 		nil,
 	}
-	server, err := poker.NewPlayerServer(&store)
-	if err != nil {
-		t.Fatalf("cannot create NewPlayerServer")
-	}
-
+	server := mustMakePlayerServer(t, &store)
 	t.Run("it records wins on POST", func(t *testing.T) {
 		player := "Pepper"
 		request := NewPostWinRequest(player)
@@ -90,11 +82,7 @@ func TestLeague(t *testing.T) {
 		}
 
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server, err := poker.NewPlayerServer(&store)
-		if err != nil {
-			t.Fatalf("cannot create NewPlayerServer")
-		}
-
+		server := mustMakePlayerServer(t, &store)
 		request := NewLeagueRequest()
 		response := httptest.NewRecorder()
 
@@ -109,10 +97,7 @@ func TestLeague(t *testing.T) {
 
 func TestGame(t *testing.T) {
 	t.Run("GET game returns 200", func(t *testing.T) {
-		server, err := poker.NewPlayerServer(&StubPlayerStore{})
-		if err != nil {
-			t.Fatalf("cannot create NewPlayerServer")
-		}
+		server := mustMakePlayerServer(t, &StubPlayerStore{})
 		request, err := NewGameRequest()
 		if err != nil {
 			t.Fatalf("cannot create a new game request")
@@ -124,12 +109,8 @@ func TestGame(t *testing.T) {
 	t.Run("when we get a message over a websocket it is a winner of a game", func(t *testing.T) {
 		store := &StubPlayerStore{}
 		winner := "Ruth"
-		handler, err := poker.NewPlayerServer(store)
-		if err != nil {
-			t.Fatalf("cannot create NewPlayerServer")
-		}
-
-		server := httptest.NewServer(handler)
+		playerServer := mustMakePlayerServer(t, store)
+		server := httptest.NewServer(playerServer.Handler)
 		defer server.Close()
 
 		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
@@ -145,4 +126,13 @@ func TestGame(t *testing.T) {
 
 		AssertPlayerWinUsingStore(t, store, winner)
 	})
+}
+
+func mustMakePlayerServer(t *testing.T, store poker.PlayerStore) *poker.PlayerServer {
+	t.Helper()
+	server, err := poker.NewPlayerServer(store)
+	if err != nil {
+		t.Fatal("problem creating player server", err)
+	}
+	return server
 }
