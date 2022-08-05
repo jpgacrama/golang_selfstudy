@@ -18,7 +18,10 @@ func TestGETPlayers(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := poker.NewPlayerServer(&store)
+	server, err := poker.NewPlayerServer(&store)
+	if err != nil {
+		t.Fatalf("cannot create NewPlayerServer")
+	}
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := NewGetScoreRequest("Pepper")
@@ -55,7 +58,10 @@ func TestStoreWins(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := poker.NewPlayerServer(&store)
+	server, err := poker.NewPlayerServer(&store)
+	if err != nil {
+		t.Fatalf("cannot create NewPlayerServer")
+	}
 
 	t.Run("it records wins on POST", func(t *testing.T) {
 		player := "Pepper"
@@ -84,7 +90,10 @@ func TestLeague(t *testing.T) {
 		}
 
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server := poker.NewPlayerServer(&store)
+		server, err := poker.NewPlayerServer(&store)
+		if err != nil {
+			t.Fatalf("cannot create NewPlayerServer")
+		}
 
 		request := NewLeagueRequest()
 		response := httptest.NewRecorder()
@@ -100,7 +109,10 @@ func TestLeague(t *testing.T) {
 
 func TestGame(t *testing.T) {
 	t.Run("GET game returns 200", func(t *testing.T) {
-		server := poker.NewPlayerServer(&StubPlayerStore{})
+		server, err := poker.NewPlayerServer(&StubPlayerStore{})
+		if err != nil {
+			t.Fatalf("cannot create NewPlayerServer")
+		}
 		request, err := NewGameRequest()
 		if err != nil {
 			t.Fatalf("cannot create a new game request")
@@ -112,11 +124,15 @@ func TestGame(t *testing.T) {
 	t.Run("when we get a message over a websocket it is a winner of a game", func(t *testing.T) {
 		store := &StubPlayerStore{}
 		winner := "Ruth"
-		server := httptest.NewServer(poker.NewPlayerServer(store))
+		handler, err := poker.NewPlayerServer(store)
+		if err != nil {
+			t.Fatalf("cannot create NewPlayerServer")
+		}
+
+		server := httptest.NewServer(handler)
 		defer server.Close()
 
 		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
-
 		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
 		if err != nil {
 			t.Fatalf("could not open a ws connection on %s %v", wsURL, err)
