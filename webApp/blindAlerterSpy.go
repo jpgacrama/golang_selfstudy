@@ -17,8 +17,11 @@ func (s *SpyBlindAlerter) ScheduleAlertAt(at time.Duration, amount int) {
 	s.alerts = append(s.alerts, ScheduledAlert{at, amount})
 }
 
-func (s *SpyBlindAlerter) GetAlerts() []ScheduledAlert {
-	return s.alerts
+func (s *SpyBlindAlerter) GetAlerts() ([]ScheduledAlert, error) {
+	if s.alerts != nil {
+		return s.alerts, nil
+	}
+	return nil, fmt.Errorf("alerts[] do not exist")
 }
 
 func (a *ScheduledAlert) GetScheduledAlertAt() time.Duration {

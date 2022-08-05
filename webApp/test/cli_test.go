@@ -96,7 +96,10 @@ func TestGame_Finish(t *testing.T) {
 
 func checkSchedulingCases(t *testing.T, cases []poker.ScheduledAlert, blindAlerter *poker.SpyBlindAlerter) {
 	t.Helper()
-	gotAlerts := blindAlerter.GetAlerts()
+	gotAlerts, err := blindAlerter.GetAlerts()
+	if err != nil {
+		t.Fatalf("There are no alerts obtained.")
+	}
 	isEqual := cmp.Equal(cases, gotAlerts)
 	if !isEqual {
 		t.Errorf("%v is not the same as %v", cases, gotAlerts)

@@ -8,7 +8,7 @@ import (
 
 type BlindAlerter interface {
 	ScheduleAlertAt(duration time.Duration, amount int)
-	GetAlerts() []ScheduledAlert
+	GetAlerts() ([]ScheduledAlert, error)
 }
 
 type BlindAlerterFunc func(duration time.Duration, amount int) BlindAlerter
@@ -24,6 +24,6 @@ func StdOutAlerter(duration time.Duration, amount int) BlindAlerter {
 	return nil
 }
 
-func (a BlindAlerterFunc) GetAlerts() []ScheduledAlert {
-	return nil
+func (a BlindAlerterFunc) GetAlerts() ([]ScheduledAlert, error) {
+	return nil, fmt.Errorf("BlindAlerter interface does not have alerts[]")
 }
