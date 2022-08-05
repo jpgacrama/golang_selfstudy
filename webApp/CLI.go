@@ -10,6 +10,7 @@ import (
 
 const PlayerPrompt = "Please enter the number of players: "
 const BadPlayerInputErrMsg = "Bad value received for number of players, please try again with a number"
+const BadWinnerStringErrMs = "There should only be one word for the winner. Please try again"
 
 type CLI struct {
 	in   *bufio.Scanner
@@ -38,13 +39,21 @@ func (cli *CLI) PlayPoker() {
 	cli.game.Start(numberOfPlayers)
 
 	winnerInput := cli.readLine()
-	winner := extractWinner(winnerInput)
+	winner, err := extractWinner(winnerInput)
+	if err != nil {
+		fmt.Fprint(cli.out, BadPlayerInputErrMsg)
+		return
+	}
 
 	cli.game.Finish(winner)
 }
 
-func extractWinner(userInput string) string {
-	return strings.Replace(userInput, " wins", "", 1)
+func extractWinner(userInput string) (string, error) {
+	fields := strings.Fields(userInput)
+	if fields[1] != "wins" {
+		return "", fmt.Errorf("malformed string to display winner. It should be \"<player> wins\\n\" instead I got: %s", userInput)
+	}
+	return strings.Replace(userInput, " wins", "", 1), nil
 }
 
 func (cli *CLI) readLine() string {

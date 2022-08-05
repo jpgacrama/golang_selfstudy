@@ -10,7 +10,6 @@ import (
 )
 
 func TestCLI(t *testing.T) {
-
 	t.Run("start game with 3 players and finish game with 'Chris' as winner", func(t *testing.T) {
 		game := &poker.GameSpy{}
 		stdout := &bytes.Buffer{}
@@ -29,16 +28,6 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 		assertGameStartedWith(t, game, 8)
 		assertFinishCalledWith(t, game, "Cleo")
-	})
-
-	t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
-		game := &poker.GameSpy{}
-		stdout := &bytes.Buffer{}
-		in := userSends("pies")
-		cli := poker.NewCLI(in, stdout, game)
-		cli.PlayPoker()
-		assertGameNotStarted(t, game)
-		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt, poker.BadPlayerInputErrMsg)
 	})
 }
 
@@ -64,6 +53,27 @@ func TestGame_Start(t *testing.T) {
 		}
 
 		checkSchedulingCases(t, cases, blindAlerter)
+	})
+}
+
+func TestGame_ErrorCases(t *testing.T) {
+	t.Run("number of players is correct but winner statement is not", func(t *testing.T) {
+		game := &poker.GameSpy{}
+		in := userSends("8", "Lloyd is a killer")
+		dummyStdOut := &bytes.Buffer{}
+		cli := poker.NewCLI(in, dummyStdOut, game)
+		cli.PlayPoker()
+		assertGameStartedWith(t, game, 8)
+		assertGameError(t, game)
+	})
+	t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
+		game := &poker.GameSpy{}
+		stdout := &bytes.Buffer{}
+		in := userSends("pies")
+		cli := poker.NewCLI(in, stdout, game)
+		cli.PlayPoker()
+		assertGameNotStarted(t, game)
+		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt, poker.BadPlayerInputErrMsg)
 	})
 }
 
@@ -119,5 +129,13 @@ func assertFinishCalledWith(t testing.TB, game *poker.GameSpy, winner string) {
 	got_winner := game.FinishedWith
 	if got_winner != winner {
 		t.Fatalf("Winner is wrong. Expected: %s, Got:%s", winner, got_winner)
+	}
+}
+
+func assertGameError(t testing.TB, game *poker.GameSpy) {
+	t.Helper()
+	gotFinishedWith := game.FinishedWith
+	if gotFinishedWith != "" {
+		t.Fatalf("Game should have thrown an error.")
 	}
 }
