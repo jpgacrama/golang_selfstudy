@@ -9,22 +9,24 @@ import (
 	"net/http/httptest"
 	"os"
 	"reflect"
+	"sort"
 	"testing"
 )
 
 type StubPlayerStore struct {
-	scores   map[string]int
-	winCalls []string
-	league   []poker.Player
+	scores  map[string]int
+	winners []string
+	league  []poker.Player
 }
 
-func AssertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
+func AssertPlayerWin(t testing.TB, game *poker.TexasHoldem, winner string) {
 	t.Helper()
-	if len(store.winCalls) != 1 {
-		t.Fatalf("got %d calls to RecordWin want %d", len(store.winCalls), 1)
-	}
-	if store.winCalls[0] != winner {
-		t.Errorf("did not store correct winner got %q want %q", store.winCalls[0], winner)
+	winnersList := game.GetStore().GetWinnerList()
+	gotWinner := sort.SearchStrings(winnersList, winner)
+
+	// This is only true if the string is NOT found
+	if gotWinner == len(winnersList) {
+		t.Errorf("did not store correct winner: got: %v, want: %v", winnersList, winner)
 	}
 }
 
@@ -108,7 +110,12 @@ func (s *StubPlayerStore) GetPlayerScore(name string) int {
 }
 
 func (s *StubPlayerStore) RecordWin(name string) {
-	s.winCalls = append(s.winCalls, name)
+	s.winners = append(s.winners, name)
+	sort.Strings(s.winners)
+}
+
+func (s *StubPlayerStore) GetWinnerList() []string {
+	return s.winners
 }
 
 func (s *StubPlayerStore) GetLeague() poker.GroupOfPlayers {

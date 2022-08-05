@@ -72,6 +72,10 @@ func FileSystemPlayerStoreFromFile(path string) (*FileSystemPlayerStore, func(),
 	return store, closeFunc, nil
 }
 
+func (f *FileSystemPlayerStore) GetWinnerList() []string {
+	return nil
+}
+
 func (f *FileSystemPlayerStore) GetLeague() GroupOfPlayers {
 	sort.SliceStable(f.league, func(i, j int) bool {
 		return f.league[i].Wins > f.league[j].Wins

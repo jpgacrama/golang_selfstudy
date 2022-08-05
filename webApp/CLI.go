@@ -2,29 +2,58 @@ package poker
 
 import (
 	"bufio"
+	"fmt"
 	"io"
+	"strconv"
 	"strings"
 )
 
+const PlayerPrompt = "Please enter the number of players: "
+const BadPlayerInputErrMsg = "Bad value received for number of players, please try again with a number"
+const BadWinnerStringErrMs = "There should only be one word for the winner. Please try again"
+
 type CLI struct {
-	playerStore PlayerStore
-	in          *bufio.Scanner
+	in   *bufio.Scanner
+	out  io.Writer
+	game Game
 }
 
-func NewCLI(store PlayerStore, in io.Reader) *CLI {
+func NewCLI(in io.Reader, out io.Writer, g Game) *CLI {
 	return &CLI{
-		playerStore: store,
-		in:          bufio.NewScanner(in),
+		in:   bufio.NewScanner(in),
+		out:  out,
+		game: g,
 	}
 }
 
 func (cli *CLI) PlayPoker() {
-	userInput := cli.readLine()
-	cli.playerStore.RecordWin(extractWinner(userInput))
+	fmt.Fprint(cli.out, PlayerPrompt)
+
+	numberOfPlayersInput := cli.readLine()
+	numberOfPlayers, err := strconv.Atoi(strings.Trim(numberOfPlayersInput, "\n"))
+	if err != nil {
+		fmt.Fprint(cli.out, BadPlayerInputErrMsg)
+		return
+	}
+
+	cli.game.Start(numberOfPlayers)
+
+	winnerInput := cli.readLine()
+	winner, err := extractWinner(winnerInput)
+	if err != nil {
+		fmt.Fprint(cli.out, BadPlayerInputErrMsg)
+		return
+	}
+
+	cli.game.Finish(winner)
 }
 
-func extractWinner(userInput string) string {
-	return strings.Replace(userInput, " wins", "", 1)
+func extractWinner(userInput string) (string, error) {
+	fields := strings.Fields(userInput)
+	if fields[1] != "wins" {
+		return "", fmt.Errorf("malformed string to display winner. It should be \"<player> wins\\n\" instead I got: %s", userInput)
+	}
+	return strings.Replace(userInput, " wins", "", 1), nil
 }
 
 func (cli *CLI) readLine() string {
