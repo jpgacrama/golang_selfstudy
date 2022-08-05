@@ -1,7 +1,7 @@
 package poker_test
 
 import (
-	"golang_selfstudy/webApp"
+	"golang_selfstudy/webApp/src"
 	"testing"
 )
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golang_selfstudy/webApp"
+	"golang_selfstudy/webApp/src"
 	"log"
 	"net/http"
 )

@@ -2,7 +2,7 @@ package poker_test
 
 import (
 	"fmt"
-	"golang_selfstudy/webApp"
+	"golang_selfstudy/webApp/src"
 	"io"
 	"net/http"
 	"net/http/httptest"

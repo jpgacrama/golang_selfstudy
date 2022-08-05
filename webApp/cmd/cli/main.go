@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"golang_selfstudy/webApp"
+	"golang_selfstudy/webApp/src"
 	"log"
 	"os"
 )

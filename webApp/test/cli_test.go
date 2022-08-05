@@ -3,7 +3,7 @@ package poker_test
 import (
 	"bytes"
 	"github.com/google/go-cmp/cmp"
-	"golang_selfstudy/webApp"
+	"golang_selfstudy/webApp/src"
 	"strings"
 	"testing"
 	"time"
