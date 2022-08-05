@@ -29,6 +29,17 @@ func AssertPlayerWin(t testing.TB, game *poker.TexasHoldem, winner string) {
 	}
 }
 
+func AssertPlayerWinUsingStore(t testing.TB, store poker.PlayerStore, winner string) {
+	t.Helper()
+	winnersList := store.GetWinnerList()
+	gotWinner := sort.SearchStrings(winnersList, winner)
+
+	// This is only true if the string is NOT found
+	if gotWinner == len(winnersList) {
+		t.Errorf("did not store correct winner: got: %v, want: %v", winnersList, winner)
+	}
+}
+
 func AssertScoreEquals(t testing.TB, got, want int) {
 	t.Helper()
 	if got != want {

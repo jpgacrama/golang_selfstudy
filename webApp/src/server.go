@@ -1,8 +1,10 @@
 package poker
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strings"
 )
@@ -49,7 +51,16 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) gameHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+	tmpl, err := template.ParseFiles("game.html")
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+	doc := &bytes.Buffer{}
+	tmpl.Execute(doc, nil)
+	s := doc.String()
+	fmt.Println(s)
 }
 
 func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
