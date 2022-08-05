@@ -57,6 +57,14 @@ func TestGame_Start(t *testing.T) {
 }
 
 func TestGame_ErrorCases(t *testing.T) {
+	t.Run("number of players is wrong game should not start", func(t *testing.T) {
+		game := &poker.GameSpy{}
+		in := userSends("john", "This string is useless")
+		dummyStdOut := &bytes.Buffer{}
+		cli := poker.NewCLI(in, dummyStdOut, game)
+		cli.PlayPoker()
+		assertGameError(t, game)
+	})
 	t.Run("number of players is correct but winner statement is not", func(t *testing.T) {
 		game := &poker.GameSpy{}
 		in := userSends("8", "Lloyd is a killer")
