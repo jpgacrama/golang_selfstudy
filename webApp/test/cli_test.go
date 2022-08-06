@@ -2,8 +2,9 @@ package poker_test
 
 import (
 	"bytes"
-	"github.com/google/go-cmp/cmp"
 	"golang_selfstudy/webApp/src"
+	"os"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -37,19 +38,20 @@ func TestGame_Start(t *testing.T) {
 		dummyPlayerStore := &StubPlayerStore{}
 		game := poker.NewGame(blindAlerter, dummyPlayerStore)
 		game.Start(5)
+		to := os.Stdout
 
 		cases := []poker.ScheduledAlert{
-			{At: 0 * time.Second, Amount: 100},
-			{At: 10 * time.Minute, Amount: 200},
-			{At: 20 * time.Minute, Amount: 300},
-			{At: 30 * time.Minute, Amount: 400},
-			{At: 40 * time.Minute, Amount: 500},
-			{At: 50 * time.Minute, Amount: 600},
-			{At: 60 * time.Minute, Amount: 800},
-			{At: 70 * time.Minute, Amount: 1000},
-			{At: 80 * time.Minute, Amount: 2000},
-			{At: 90 * time.Minute, Amount: 4000},
-			{At: 100 * time.Minute, Amount: 8000},
+			{At: 0 * time.Second, Amount: 100, To: to},
+			{At: 10 * time.Minute, Amount: 200, To: to},
+			{At: 20 * time.Minute, Amount: 300, To: to},
+			{At: 30 * time.Minute, Amount: 400, To: to},
+			{At: 40 * time.Minute, Amount: 500, To: to},
+			{At: 50 * time.Minute, Amount: 600, To: to},
+			{At: 60 * time.Minute, Amount: 800, To: to},
+			{At: 70 * time.Minute, Amount: 1000, To: to},
+			{At: 80 * time.Minute, Amount: 2000, To: to},
+			{At: 90 * time.Minute, Amount: 4000, To: to},
+			{At: 100 * time.Minute, Amount: 8000, To: to},
 		}
 
 		checkSchedulingCases(t, cases, blindAlerter)
@@ -100,7 +102,7 @@ func checkSchedulingCases(t *testing.T, cases []poker.ScheduledAlert, blindAlert
 	if err != nil {
 		t.Fatalf("There are no alerts obtained.")
 	}
-	isEqual := cmp.Equal(cases, gotAlerts)
+	isEqual := reflect.DeepEqual(cases, gotAlerts)
 	if !isEqual {
 		t.Errorf("%v is not the same as %v", cases, gotAlerts)
 	}
