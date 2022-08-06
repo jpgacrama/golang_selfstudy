@@ -16,7 +16,8 @@ func main() {
 	}
 	defer close()
 
-	server, err := poker.NewPlayerServer(store)
+	dummyGame := &poker.GameSpy{}
+	server, err := poker.NewPlayerServer(store, dummyGame)
 	if err != nil {
 		log.Fatal(err)
 	}

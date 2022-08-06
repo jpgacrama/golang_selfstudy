@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestGETPlayers(t *testing.T) {
@@ -18,7 +19,8 @@ func TestGETPlayers(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := mustMakePlayerServer(t, &store)
+	dummyGame := &poker.GameSpy{}
+	server := mustMakePlayerServer(t, &store, dummyGame)
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := NewGetScoreRequest("Pepper")
 		response := httptest.NewRecorder()
@@ -54,7 +56,8 @@ func TestStoreWins(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := mustMakePlayerServer(t, &store)
+	dummyGame := &poker.GameSpy{}
+	server := mustMakePlayerServer(t, &store, dummyGame)
 	t.Run("it records wins on POST", func(t *testing.T) {
 		player := "Pepper"
 		request := NewPostWinRequest(player)
@@ -82,7 +85,8 @@ func TestLeague(t *testing.T) {
 		}
 
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server := mustMakePlayerServer(t, &store)
+		dummyGame := &poker.GameSpy{}
+		server := mustMakePlayerServer(t, &store, dummyGame)
 		request := NewLeagueRequest()
 		response := httptest.NewRecorder()
 
@@ -97,7 +101,8 @@ func TestLeague(t *testing.T) {
 
 func TestGame(t *testing.T) {
 	t.Run("GET game returns 200", func(t *testing.T) {
-		server := mustMakePlayerServer(t, &StubPlayerStore{})
+		dummyGame := &poker.GameSpy{}
+		server := mustMakePlayerServer(t, &StubPlayerStore{}, dummyGame)
 		request, err := NewGameRequest()
 		if err != nil {
 			t.Fatalf("cannot create a new game request")
@@ -106,25 +111,29 @@ func TestGame(t *testing.T) {
 		server.ServeHTTP(response, request)
 		AssertStatus(t, response, http.StatusOK)
 	})
-	t.Run("when we get a message over a websocket it is a winner of a game", func(t *testing.T) {
-		store := &StubPlayerStore{}
+	t.Run("start a game with 3 players and declare Ruth the winner", func(t *testing.T) {
+		dummyPlayerStore := &StubPlayerStore{}
+		game := &poker.GameSpy{}
 		winner := "Ruth"
-		playerServer := mustMakePlayerServer(t, store)
-		server := httptest.NewServer(playerServer.Handler)
-		defer server.Close()
+		server := httptest.NewServer(mustMakePlayerServer(t, dummyPlayerStore, game))
+		ws := mustDialWS(t, "ws"+strings.TrimPrefix(server.URL, "http")+"/ws")
 
-		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
-		ws := mustDialWS(t, wsURL)
+		defer server.Close()
 		defer ws.Close()
 
+		writeWSMessage(t, ws, "3")
 		writeWSMessage(t, ws, winner)
-		AssertPlayerWinUsingStore(t, store, winner)
+
+		// This is BAD. I should just have an async definition here
+		time.Sleep(10 * time.Millisecond)
+		assertGameStartedWith(t, game, 3)
+		assertFinishCalledWith(t, game, winner)
 	})
 }
 
-func mustMakePlayerServer(t *testing.T, store poker.PlayerStore) *poker.PlayerServer {
+func mustMakePlayerServer(t *testing.T, store poker.PlayerStore, game poker.Game) *poker.PlayerServer {
 	t.Helper()
-	server, err := poker.NewPlayerServer(store)
+	server, err := poker.NewPlayerServer(store, game)
 	if err != nil {
 		t.Fatal("problem creating player server", err)
 	}
