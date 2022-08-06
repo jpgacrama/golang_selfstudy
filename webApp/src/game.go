@@ -1,18 +1,20 @@
 package poker
 
 import (
+	"io"
 	"os"
 	"time"
 )
 
 type Game interface {
-	Start(numberOfPlayers int)
+	Start(numberOfPlayers int, alertsDestination io.Writer)
 	Finish(winner string)
 }
 
 type TexasHoldem struct {
 	alerter BlindAlerter
 	store   PlayerStore
+	dest    io.Writer
 }
 
 func NewGame(alerter BlindAlerter, store PlayerStore) *TexasHoldem {
@@ -22,7 +24,7 @@ func NewGame(alerter BlindAlerter, store PlayerStore) *TexasHoldem {
 	}
 }
 
-func (p *TexasHoldem) Start(numberOfPlayers int) {
+func (p *TexasHoldem) Start(numberOfPlayers int, alertsDestination io.Writer) {
 	blindIncrement := time.Duration(5+numberOfPlayers) * time.Minute
 
 	blinds := []int{100, 200, 300, 400, 500, 600, 800, 1000, 2000, 4000, 8000}
@@ -31,6 +33,7 @@ func (p *TexasHoldem) Start(numberOfPlayers int) {
 		p.alerter.ScheduleAlertAt(blindTime, blind, os.Stdout)
 		blindTime = blindTime + blindIncrement
 	}
+	p.dest = alertsDestination
 }
 
 func (p *TexasHoldem) Finish(winner string) {

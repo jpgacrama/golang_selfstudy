@@ -37,8 +37,8 @@ func TestGame_Start(t *testing.T) {
 		blindAlerter := &poker.SpyBlindAlerter{}
 		dummyPlayerStore := &StubPlayerStore{}
 		game := poker.NewGame(blindAlerter, dummyPlayerStore)
-		game.Start(5)
 		to := os.Stdout
+		game.Start(5, to)
 
 		cases := []poker.ScheduledAlert{
 			{At: 0 * time.Second, Amount: 100, To: to},
