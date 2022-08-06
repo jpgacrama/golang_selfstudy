@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"sync"
 )
 
 func main() {
@@ -15,28 +14,37 @@ func main() {
 		"https://wizzair.com/",
 		"https://www.swiss.com/",
 	}
-	wg := sync.WaitGroup{}
 
-	for _, u := range urls {
-		// Increment the wait group counter
-		wg.Add(1)
-		go func(url string) {
-			// Decrement the counter when the go routine completes
-			defer wg.Done()
-			// Call the function check
-			checkUrl(url)
-		}(u)
+	c := make(chan urlStatus)
+	for _, url := range urls {
+		go checkUrl(url, c)
+
 	}
-	// Wait for all the checkWebsite calls to finish
-	wg.Wait()
+	result := make([]urlStatus, len(urls))
+	for i, _ := range result {
+		result[i] = <-c
+		if result[i].status {
+			fmt.Println(result[i].url, "is up.")
+		} else {
+			fmt.Println(result[i].url, "is down !!")
+		}
+	}
+
 }
 
 // checks and prints a message if a website is up or down
-func checkUrl(url string) {
+func checkUrl(url string, c chan urlStatus) {
 	_, err := http.Get(url)
 	if err != nil {
-		fmt.Println(url, "is down !!!")
-		return
+		// The website is down
+		c <- urlStatus{url, false}
+	} else {
+		// The website is up
+		c <- urlStatus{url, true}
 	}
-	fmt.Println(url, "is up and running.")
+}
+
+type urlStatus struct {
+	url    string
+	status bool
 }
