@@ -3,7 +3,7 @@ package poker_test
 import (
 	"bytes"
 	"golang_selfstudy/webApp/src"
-	"os"
+	"io"
 	"reflect"
 	"strings"
 	"testing"
@@ -37,7 +37,7 @@ func TestGame_Start(t *testing.T) {
 		blindAlerter := &poker.SpyBlindAlerter{}
 		dummyPlayerStore := &StubPlayerStore{}
 		game := poker.NewGame(blindAlerter, dummyPlayerStore)
-		to := os.Stdout
+		to := io.Discard
 		game.Start(5, to)
 
 		cases := []poker.ScheduledAlert{
