@@ -4,25 +4,27 @@ import (
 	"golang_selfstudy/webApp/src"
 	"log"
 	"net/http"
+	"os"
 )
 
 const dbFileName = "game.db.json"
 
 func main() {
-	store, close, err := poker.FileSystemPlayerStoreFromFile(dbFileName)
-
+	db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
-	defer close()
 
-	dummyGame := &poker.GameSpy{}
-	server, err := poker.NewPlayerServer(store, dummyGame)
+	store, err := poker.NewFileSystemPlayerStore(db)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("problem creating file system player store, %v ", err)
 	}
 
-	if err := http.ListenAndServe(":8080", server); err != nil {
-		log.Fatalf("could not listen on port 8080 %v", err)
+	game := poker.NewTexasHoldem(poker.BlindAlerterFunc(poker.Alerter), store)
+	server, err := poker.NewPlayerServer(store, game)
+	if err != nil {
+		log.Fatalf("problem creating player server %v", err)
 	}
+
+	log.Fatal(http.ListenAndServe(":8080", server))
 }

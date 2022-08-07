@@ -11,7 +11,7 @@ type BlindAlerter interface {
 	GetAlerts() ([]ScheduledAlert, error)
 }
 
-type BlindAlerterFunc func(duration time.Duration, amount int, to io.Writer) BlindAlerter
+type BlindAlerterFunc func(duration time.Duration, amount int, to io.Writer)
 
 func (a BlindAlerterFunc) ScheduleAlertAt(duration time.Duration, amount int, to io.Writer) {
 	a(duration, amount, to)

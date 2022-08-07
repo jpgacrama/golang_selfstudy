@@ -36,7 +36,7 @@ func TestGame_Start(t *testing.T) {
 	t.Run("schedules alerts on game start for 5 players", func(t *testing.T) {
 		blindAlerter := &poker.SpyBlindAlerter{}
 		dummyPlayerStore := &StubPlayerStore{}
-		game := poker.NewGame(blindAlerter, dummyPlayerStore)
+		game := poker.NewTexasHoldem(blindAlerter, dummyPlayerStore)
 		to := io.Discard
 		game.Start(5, to)
 
@@ -90,7 +90,7 @@ func TestGame_ErrorCases(t *testing.T) {
 func TestGame_Finish(t *testing.T) {
 	store := &StubPlayerStore{}
 	dummyBlindAlerter := &poker.SpyBlindAlerter{}
-	game := poker.NewGame(dummyBlindAlerter, store)
+	game := poker.NewTexasHoldem(dummyBlindAlerter, store)
 	winner := "Ruth"
 	game.Finish(winner)
 	AssertPlayerWin(t, game, winner)
