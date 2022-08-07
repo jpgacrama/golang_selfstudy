@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"html/template"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -70,11 +69,9 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 
 func (p *PlayerServer) webSocket(w http.ResponseWriter, r *http.Request) {
 	ws := newPlayerServerWS(w, r)
-
 	numberOfPlayersMsg := ws.WaitForMsg()
 	numberOfPlayers, _ := strconv.Atoi(numberOfPlayersMsg)
-	p.game.Start(numberOfPlayers, io.Discard) //todo: Don't discard the blinds messages!
-
+	p.game.Start(numberOfPlayers, ws)
 	winner := ws.WaitForMsg()
 	p.game.Finish(winner)
 }
