@@ -5,18 +5,19 @@ import (
 )
 
 type GameSpy struct {
-	StartedWith       int
-	FinishedWith      string
-	StartCalled       bool
-	AlertsDestination io.Writer
+	StartCalled      bool
+	StartCalledWith  int
+	BlindAlert       []byte
+	FinishedCalled   bool
+	FinishCalledWith string
 }
 
-func (g *GameSpy) Start(numberOfPlayers int, alertsDestination io.Writer) {
-	g.StartedWith = numberOfPlayers
+func (g *GameSpy) Start(numberOfPlayers int, out io.Writer) {
 	g.StartCalled = true
-	g.AlertsDestination = alertsDestination
+	g.StartCalledWith = numberOfPlayers
+	out.Write(g.BlindAlert)
 }
 
 func (g *GameSpy) Finish(winner string) {
-	g.FinishedWith = winner
+	g.FinishCalledWith = winner
 }

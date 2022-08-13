@@ -19,7 +19,7 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
 		assertGameStartedWith(t, game, 3)
-		assertFinishCalledWith(t, game, "Chris")
+		assertFinishWith(t, game, "Chris")
 	})
 	t.Run("start game with 8 players and record 'Cleo' as winner", func(t *testing.T) {
 		game := &poker.GameSpy{}
@@ -28,7 +28,7 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, dummyStdOut, game)
 		cli.PlayPoker()
 		assertGameStartedWith(t, game, 8)
-		assertFinishCalledWith(t, game, "Cleo")
+		assertFinishWith(t, game, "Cleo")
 	})
 }
 
@@ -131,15 +131,15 @@ func assertGameNotStarted(t testing.TB, game *poker.GameSpy) {
 
 func assertGameStartedWith(t testing.TB, game *poker.GameSpy, numPlayers int) {
 	t.Helper()
-	got_players := game.StartedWith
+	got_players := game.StartCalledWith
 	if got_players != numPlayers {
 		t.Fatalf("Game started with the wrong number of players. Expected: %d, Got:%d", numPlayers, got_players)
 	}
 }
 
-func assertFinishCalledWith(t testing.TB, game *poker.GameSpy, winner string) {
+func assertFinishWith(t testing.TB, game *poker.GameSpy, winner string) {
 	t.Helper()
-	got_winner := game.FinishedWith
+	got_winner := game.FinishCalledWith
 	if got_winner != winner {
 		t.Fatalf("Winner is wrong. Expected: %s, Got:%s", winner, got_winner)
 	}
@@ -147,8 +147,8 @@ func assertFinishCalledWith(t testing.TB, game *poker.GameSpy, winner string) {
 
 func assertGameError(t testing.TB, game *poker.GameSpy) {
 	t.Helper()
-	gotFinishedWith := game.FinishedWith
-	if gotFinishedWith != "" {
+	gotFinishCalledWith := game.FinishCalledWith
+	if gotFinishCalledWith != "" {
 		t.Fatalf("Game should have thrown an error.")
 	}
 }

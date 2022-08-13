@@ -111,10 +111,12 @@ func TestGame(t *testing.T) {
 		server.ServeHTTP(response, request)
 		AssertStatus(t, response, http.StatusOK)
 	})
-	t.Run("start a game with 3 players and declare Ruth the winner", func(t *testing.T) {
-		dummyPlayerStore := &StubPlayerStore{}
-		game := &poker.GameSpy{}
+	t.Run("start a game with 3 players, send some blind alerts down WS and declare Ruth the winner", func(t *testing.T) {
+		wantedBlindAlert := "Blind is 100"
 		winner := "Ruth"
+
+		game := &poker.GameSpy{BlindAlert: []byte(wantedBlindAlert)}
+		dummyPlayerStore := &StubPlayerStore{}
 		server := httptest.NewServer(mustMakePlayerServer(t, dummyPlayerStore, game))
 		ws := mustDialWS(t, "ws"+strings.TrimPrefix(server.URL, "http")+"/ws")
 
@@ -124,10 +126,15 @@ func TestGame(t *testing.T) {
 		writeWSMessage(t, ws, "3")
 		writeWSMessage(t, ws, winner)
 
-		// This is BAD. I should just have an async definition here
 		time.Sleep(10 * time.Millisecond)
 		assertGameStartedWith(t, game, 3)
-		assertFinishCalledWith(t, game, winner)
+		assertFinishWith(t, game, winner)
+
+		_, gotBlindAlert, _ := ws.ReadMessage()
+
+		if string(gotBlindAlert) != wantedBlindAlert {
+			t.Errorf("got blind alert %q, want %q", string(gotBlindAlert), wantedBlindAlert)
+		}
 	})
 }
 
