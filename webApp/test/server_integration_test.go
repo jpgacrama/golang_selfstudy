@@ -1,10 +1,10 @@
 package poker_test
 
 import (
-	"golang_selfstudy/webApp/src"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"webApp/src"
 )
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {

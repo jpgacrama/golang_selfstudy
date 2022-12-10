@@ -2,12 +2,12 @@ package poker_test
 
 import (
 	"github.com/gorilla/websocket"
-	"golang_selfstudy/webApp/src"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+	"webApp/src"
 )
 
 func TestGETPlayers(t *testing.T) {

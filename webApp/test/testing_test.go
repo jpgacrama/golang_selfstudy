@@ -2,7 +2,6 @@ package poker_test
 
 import (
 	"fmt"
-	"golang_selfstudy/webApp/src"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +9,7 @@ import (
 	"reflect"
 	"sort"
 	"testing"
+	"webApp/src"
 )
 
 type StubPlayerStore struct {

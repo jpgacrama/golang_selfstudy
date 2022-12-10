@@ -2,12 +2,12 @@ package poker_test
 
 import (
 	"bytes"
-	"golang_selfstudy/webApp/src"
 	"io"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+	"webApp/src"
 )
 
 func TestCLI(t *testing.T) {
