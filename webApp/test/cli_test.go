@@ -87,17 +87,13 @@ func TestGame_EnterNumberOfPlayers_AndStart(t *testing.T) {
 		stdout := &bytes.Buffer{}
 		in := userSends("7", "Jonas wins")
 		game := &poker.GameSpy{}
-
 		cli := poker.NewCLI(in, stdout, game)
 		cli.PlayPoker()
-
 		gotPrompt := stdout.String()
 		wantPrompt := poker.PlayerPrompt
-
 		if gotPrompt != wantPrompt {
 			t.Errorf("got %q, want %q", gotPrompt, wantPrompt)
 		}
-
 		if game.StartCalledWith != 7 {
 			t.Errorf("wanted Start called with 7 but got %d", game.StartCalledWith)
 		}
@@ -134,12 +130,34 @@ func TestGame_ErrorCases(t *testing.T) {
 }
 
 func TestGame_Finish(t *testing.T) {
-	store := &StubPlayerStore{}
-	dummyBlindAlerter := &poker.SpyBlindAlerter{}
-	game := poker.NewTexasHoldem(dummyBlindAlerter, store)
-	winner := "Ruth"
-	game.Finish(winner)
-	AssertPlayerWin(t, game, winner)
+	t.Run("start game with 3 players and finish game with 'Chris' as winner", func(t *testing.T) {
+		game := &poker.GameSpy{}
+		stdout := &bytes.Buffer{}
+		in := userSends("3", "Chris wins")
+		cli := poker.NewCLI(in, stdout, game)
+		cli.PlayPoker()
+		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
+		assertGameStartedWith(t, game, 3)
+		assertFinishWith(t, game, "Chris")
+	})
+	t.Run("start game with 8 players and record 'Cleo' as winner", func(t *testing.T) {
+		game := &poker.GameSpy{}
+		in := userSends("8", "Cleo wins")
+		dummyStdOut := &bytes.Buffer{}
+		cli := poker.NewCLI(in, dummyStdOut, game)
+		cli.PlayPoker()
+		assertGameStartedWith(t, game, 8)
+		assertFinishWith(t, game, "Cleo")
+	})
+	t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
+		game := &poker.GameSpy{}
+		stdout := &bytes.Buffer{}
+		in := userSends("pies")
+		cli := poker.NewCLI(in, stdout, game)
+		cli.PlayPoker()
+		assertGameNotStarted(t, game)
+		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt, poker.BadPlayerInputErrMsg)
+	})
 }
 
 func checkSchedulingCases(t *testing.T, cases []poker.ScheduledAlert, blindAlerter *poker.SpyBlindAlerter) {
