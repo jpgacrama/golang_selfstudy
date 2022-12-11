@@ -1,10 +1,10 @@
 package poker_test
 
 import (
-	"golang_selfstudy/webApp"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"webApp/src"
 )
 
 func TestRecordingWinsAndRetrievingThem(t *testing.T) {
@@ -13,7 +13,11 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	store, err := poker.NewFileSystemPlayerStore(database)
 	AssertNoError(t, err)
 
-	server := poker.NewPlayerServer(store)
+	dummyGame := &poker.GameSpy{}
+	server, err := poker.NewPlayerServer(store, dummyGame)
+	if err != nil {
+		t.Fatalf("cannot create NewPlayerServer")
+	}
 	singlePlayer := "Pepper"
 
 	server.ServeHTTP(httptest.NewRecorder(), NewPostWinRequest(singlePlayer))
@@ -23,7 +27,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	t.Run("get score", func(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, NewGetScoreRequest(singlePlayer))
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 
 		AssertResponseBody(t, response.Body.String(), "3")
 	})
@@ -31,7 +35,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	t.Run("get league", func(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, NewLeagueRequest())
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 
 		got := GetLeagueFromResponse(t, response.Body)
 		want := poker.GroupOfPlayers{

@@ -2,15 +2,14 @@ package poker_test
 
 import (
 	"fmt"
-	"golang_selfstudy/webApp"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"reflect"
 	"sort"
 	"testing"
+	"webApp/src"
 )
 
 type StubPlayerStore struct {
@@ -22,6 +21,17 @@ type StubPlayerStore struct {
 func AssertPlayerWin(t testing.TB, game *poker.TexasHoldem, winner string) {
 	t.Helper()
 	winnersList := game.GetStore().GetWinnerList()
+	gotWinner := sort.SearchStrings(winnersList, winner)
+
+	// This is only true if the string is NOT found
+	if gotWinner == len(winnersList) {
+		t.Errorf("did not store correct winner: got: %v, want: %v", winnersList, winner)
+	}
+}
+
+func AssertPlayerWinUsingStore(t testing.TB, store poker.PlayerStore, winner string) {
+	t.Helper()
+	winnersList := store.GetWinnerList()
 	gotWinner := sort.SearchStrings(winnersList, winner)
 
 	// This is only true if the string is NOT found
@@ -44,8 +54,9 @@ func AssertNoError(t testing.TB, err error) {
 	}
 }
 
-func AssertStatus(t testing.TB, got, want int) {
+func AssertStatus(t testing.TB, response *httptest.ResponseRecorder, want int) {
 	t.Helper()
+	got := response.Code
 	if got != want {
 		t.Errorf("did not get correct status, got %d, want %d", got, want)
 	}
@@ -75,7 +86,7 @@ func AssertContentType(t testing.TB, response *httptest.ResponseRecorder, want s
 // This is an Adapter pattern. Call the function returned from this one to close the file safely
 func CreateTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	t.Helper()
-	tmpfile, err := ioutil.TempFile("", "db")
+	tmpfile, err := os.CreateTemp("", "db")
 	if err != nil {
 		t.Fatalf("could not create temp file %v", err)
 	}
@@ -102,6 +113,10 @@ func NewPostWinRequest(name string) *http.Request {
 func NewLeagueRequest() *http.Request {
 	req, _ := http.NewRequest(http.MethodGet, "/league", nil)
 	return req
+}
+
+func NewGameRequest() (*http.Request, error) {
+	return http.NewRequest(http.MethodGet, "/game", nil)
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {

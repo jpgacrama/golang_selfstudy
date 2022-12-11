@@ -1,8 +1,8 @@
 package poker_test
 
 import (
-	"golang_selfstudy/webApp"
 	"testing"
+	"webApp/src"
 )
 
 func TestFileSystemStore(t *testing.T) {

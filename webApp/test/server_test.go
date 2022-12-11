@@ -1,10 +1,13 @@
 package poker_test
 
 import (
-	"golang_selfstudy/webApp"
+	"github.com/gorilla/websocket"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
+	"webApp/src"
 )
 
 func TestGETPlayers(t *testing.T) {
@@ -16,15 +19,15 @@ func TestGETPlayers(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := poker.NewPlayerServer(&store)
-
+	dummyGame := &poker.GameSpy{}
+	server := mustMakePlayerServer(t, &store, dummyGame)
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := NewGetScoreRequest("Pepper")
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 		AssertResponseBody(t, response.Body.String(), "20")
 	})
 
@@ -34,7 +37,7 @@ func TestGETPlayers(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 		AssertResponseBody(t, response.Body.String(), "10")
 	})
 
@@ -43,7 +46,7 @@ func TestGETPlayers(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
-		AssertStatus(t, response.Code, http.StatusNotFound)
+		AssertStatus(t, response, http.StatusNotFound)
 	})
 }
 
@@ -53,15 +56,15 @@ func TestStoreWins(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := poker.NewPlayerServer(&store)
-
+	dummyGame := &poker.GameSpy{}
+	server := mustMakePlayerServer(t, &store, dummyGame)
 	t.Run("it records wins on POST", func(t *testing.T) {
 		player := "Pepper"
 		request := NewPostWinRequest(player)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
-		AssertStatus(t, response.Code, http.StatusAccepted)
+		AssertStatus(t, response, http.StatusAccepted)
 
 		if len(store.winners) != 1 {
 			t.Fatalf("got %d calls to RecordWin want %d", len(store.winners), 1)
@@ -82,16 +85,82 @@ func TestLeague(t *testing.T) {
 		}
 
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server := poker.NewPlayerServer(&store)
-
+		dummyGame := &poker.GameSpy{}
+		server := mustMakePlayerServer(t, &store, dummyGame)
 		request := NewLeagueRequest()
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 
 		got := GetLeagueFromResponse(t, response.Body)
-		AssertStatus(t, response.Code, http.StatusOK)
+		AssertStatus(t, response, http.StatusOK)
 		AssertLeague(t, got, wantedLeague)
 		AssertContentType(t, response, poker.JsonContentType)
 	})
+}
+
+func TestGame(t *testing.T) {
+	t.Run("GET game returns 200", func(t *testing.T) {
+		dummyGame := &poker.GameSpy{}
+		server := mustMakePlayerServer(t, &StubPlayerStore{}, dummyGame)
+		request, err := NewGameRequest()
+		if err != nil {
+			t.Fatalf("cannot create a new game request")
+		}
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+		AssertStatus(t, response, http.StatusOK)
+	})
+	t.Run("start a game with 3 players, send some blind alerts down WS and declare Ruth the winner", func(t *testing.T) {
+		wantedBlindAlert := "Blind is 100"
+		winner := "Ruth"
+
+		game := &poker.GameSpy{BlindAlert: []byte(wantedBlindAlert)}
+		dummyPlayerStore := &StubPlayerStore{}
+		server := httptest.NewServer(mustMakePlayerServer(t, dummyPlayerStore, game))
+		ws := mustDialWS(t, "ws"+strings.TrimPrefix(server.URL, "http")+"/ws")
+
+		defer server.Close()
+		defer ws.Close()
+
+		writeWSMessage(t, ws, "3")
+		writeWSMessage(t, ws, winner)
+
+		time.Sleep(10 * time.Millisecond)
+		assertGameStartedWith(t, game, 3)
+		assertFinishWith(t, game, winner)
+
+		_, gotBlindAlert, _ := ws.ReadMessage()
+
+		if string(gotBlindAlert) != wantedBlindAlert {
+			t.Errorf("got blind alert %q, want %q", string(gotBlindAlert), wantedBlindAlert)
+		}
+	})
+}
+
+func mustMakePlayerServer(t *testing.T, store poker.PlayerStore, game poker.Game) *poker.PlayerServer {
+	t.Helper()
+	server, err := poker.NewPlayerServer(store, game)
+	if err != nil {
+		t.Fatal("problem creating player server", err)
+	}
+	return server
+}
+
+// Close must be invoked by the calling function
+func mustDialWS(t *testing.T, url string) *websocket.Conn {
+	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
+
+	if err != nil {
+		t.Fatalf("could not open a ws connection on %s %v", url, err)
+	}
+
+	return ws
+}
+
+func writeWSMessage(t testing.TB, conn *websocket.Conn, message string) {
+	t.Helper()
+	if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+		t.Fatalf("could not send message over ws connection %v", err)
+	}
 }
