@@ -125,16 +125,12 @@ func TestGame(t *testing.T) {
 
 		writeWSMessage(t, ws, "3")
 		writeWSMessage(t, ws, winner)
+		const timeout = 5 * time.Second
 
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(timeout)
 		assertGameStartedWith(t, game, 3)
 		assertFinishWith(t, game, winner)
-
-		_, gotBlindAlert, _ := ws.ReadMessage()
-
-		if string(gotBlindAlert) != wantedBlindAlert {
-			t.Errorf("got blind alert %q, want %q", string(gotBlindAlert), wantedBlindAlert)
-		}
+		within(t, timeout, func() { assertWebsocketGotMsg(t, ws, wantedBlindAlert) })
 	})
 }
 
@@ -162,5 +158,27 @@ func writeWSMessage(t testing.TB, conn *websocket.Conn, message string) {
 	t.Helper()
 	if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
 		t.Fatalf("could not send message over ws connection %v", err)
+	}
+}
+
+func within(t testing.TB, d time.Duration, assert func()) {
+	t.Helper()
+	done := make(chan struct{}, 1)
+	go func() {
+		assert()
+		done <- struct{}{}
+	}()
+
+	select {
+	case <-time.After(d):
+		t.Error("timed out")
+	case <-done:
+	}
+}
+
+func assertWebsocketGotMsg(t *testing.T, ws *websocket.Conn, want string) {
+	_, msg, _ := ws.ReadMessage()
+	if string(msg) != want {
+		t.Errorf(`got "%s", want "%s"`, string(msg), want)
 	}
 }
