@@ -24,7 +24,7 @@ type PlayerServer struct {
 	game     Game
 }
 
-const jsonContentType = "application/json"
+const JsonContentType = "application/json"
 
 type PlayerStore interface {
 	GetPlayerScore(name string) int
