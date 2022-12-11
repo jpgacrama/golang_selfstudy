@@ -1,10 +1,10 @@
 package main
 
 import (
-	"golang_selfstudy/webApp/src"
 	"log"
 	"net/http"
 	"os"
+	"webApp/src"
 )
 
 const dbFileName = "game.db.json"
