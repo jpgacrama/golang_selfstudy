@@ -82,6 +82,28 @@ func TestGame_Start(t *testing.T) {
 	})
 }
 
+func TestGame_EnterNumberOfPlayers_AndStart(t *testing.T) {
+	t.Run("it prompts the user to enter the number of players and starts the game", func(t *testing.T) {
+		stdout := &bytes.Buffer{}
+		in := userSends("7", "Jonas wins")
+		game := &poker.GameSpy{}
+
+		cli := poker.NewCLI(in, stdout, game)
+		cli.PlayPoker()
+
+		gotPrompt := stdout.String()
+		wantPrompt := poker.PlayerPrompt
+
+		if gotPrompt != wantPrompt {
+			t.Errorf("got %q, want %q", gotPrompt, wantPrompt)
+		}
+
+		if game.StartCalledWith != 7 {
+			t.Errorf("wanted Start called with 7 but got %d", game.StartCalledWith)
+		}
+	})
+}
+
 func TestGame_ErrorCases(t *testing.T) {
 	t.Run("number of players is wrong game should not start", func(t *testing.T) {
 		game := &poker.GameSpy{}
