@@ -42,18 +42,42 @@ func TestGame_Start(t *testing.T) {
 
 		cases := []poker.ScheduledAlert{
 			{At: 0 * time.Second, Amount: 100, To: to},
-			{At: 10 * time.Minute, Amount: 200, To: to},
-			{At: 20 * time.Minute, Amount: 300, To: to},
-			{At: 30 * time.Minute, Amount: 400, To: to},
-			{At: 40 * time.Minute, Amount: 500, To: to},
-			{At: 50 * time.Minute, Amount: 600, To: to},
-			{At: 60 * time.Minute, Amount: 800, To: to},
-			{At: 70 * time.Minute, Amount: 1000, To: to},
-			{At: 80 * time.Minute, Amount: 2000, To: to},
-			{At: 90 * time.Minute, Amount: 4000, To: to},
-			{At: 100 * time.Minute, Amount: 8000, To: to},
+			{At: 10 * time.Second, Amount: 200, To: to},
+			{At: 20 * time.Second, Amount: 300, To: to},
+			{At: 30 * time.Second, Amount: 400, To: to},
+			{At: 40 * time.Second, Amount: 500, To: to},
+			{At: 50 * time.Second, Amount: 600, To: to},
+			{At: 60 * time.Second, Amount: 800, To: to},
+			{At: 70 * time.Second, Amount: 1000, To: to},
+			{At: 80 * time.Second, Amount: 2000, To: to},
+			{At: 90 * time.Second, Amount: 4000, To: to},
+			{At: 100 * time.Second, Amount: 8000, To: to},
 		}
 
+		checkSchedulingCases(t, cases, blindAlerter)
+	})
+
+	t.Run("schedules alerts on game starts for 7 players", func(t *testing.T) {
+		blindAlerter := &poker.SpyBlindAlerter{}
+		dummyPlayerStore := &StubPlayerStore{}
+		game := poker.NewTexasHoldem(blindAlerter, dummyPlayerStore)
+
+		to := io.Discard
+		game.Start(7, to)
+
+		cases := []poker.ScheduledAlert{
+			{At: 0 * time.Second, Amount: 100, To: to},
+			{At: 12 * time.Second, Amount: 200, To: to},
+			{At: 24 * time.Second, Amount: 300, To: to},
+			{At: 36 * time.Second, Amount: 400, To: to},
+			{At: 48 * time.Second, Amount: 500, To: to},
+			{At: 60 * time.Second, Amount: 600, To: to},
+			{At: 72 * time.Second, Amount: 800, To: to},
+			{At: 84 * time.Second, Amount: 1000, To: to},
+			{At: 96 * time.Second, Amount: 2000, To: to},
+			{At: 108 * time.Second, Amount: 4000, To: to},
+			{At: 120 * time.Second, Amount: 8000, To: to},
+		}
 		checkSchedulingCases(t, cases, blindAlerter)
 	})
 }
@@ -104,7 +128,7 @@ func checkSchedulingCases(t *testing.T, cases []poker.ScheduledAlert, blindAlert
 	}
 	isEqual := reflect.DeepEqual(cases, gotAlerts)
 	if !isEqual {
-		t.Errorf("%v is not the same as %v", cases, gotAlerts)
+		t.Errorf("\n\t%v \n is not the same as \n\t%v", cases, gotAlerts)
 	}
 }
 
