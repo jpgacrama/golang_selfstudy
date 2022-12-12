@@ -1,0 +1,12 @@
+<payload>
+    <message>Happy New Year!</message>
+</payload>
+I wrote a simple test to show it in action
+func TestGetData(t *testing.T) {
+    got := GetData()
+    want := "HAPPY NEW YEAR!"
+
+    if got != want {
+        t.Errorf("got %q, want %q", got, want)
+    }
+}
