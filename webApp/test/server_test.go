@@ -1,13 +1,15 @@
 package poker_test
 
 import (
-	"github.com/gorilla/websocket"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 	"webApp/src"
+
+	"github.com/gorilla/websocket"
 )
 
 func TestGETPlayers(t *testing.T) {
@@ -171,8 +173,9 @@ func within(t testing.TB, d time.Duration, assert func()) {
 
 	select {
 	case <-time.After(d):
-		t.Error("timed out")
+		t.Error("\ntimed out\n")
 	case <-done:
+		fmt.Println("\nProgram is done waiting")
 	}
 }
 
