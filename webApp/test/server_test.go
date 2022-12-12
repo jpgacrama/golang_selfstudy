@@ -131,7 +131,7 @@ func TestGame(t *testing.T) {
 
 		time.Sleep(timeout)
 		assertGameStartedWith(t, game, 3)
-		assertFinishWith(t, game, winner)
+		assertFinishCalledWith(t, game, winner)
 		within(t, timeout, func() { assertWebsocketGotMsg(t, ws, wantedBlindAlert) })
 	})
 }
