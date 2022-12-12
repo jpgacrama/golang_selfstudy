@@ -19,7 +19,7 @@ func GetData(data io.Reader) string {
 }
 
 func GetXMLFromCommand() io.Reader {
-	cmd := exec.Command("cat", "msg.xml")
+	cmd := exec.Command("cat", "../xml/msg.xml")
 	out, _ := cmd.StdoutPipe()
 	cmd.Start()
 	data, _ := io.ReadAll(out)
