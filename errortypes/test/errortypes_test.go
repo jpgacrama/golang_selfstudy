@@ -1,6 +1,7 @@
 package errortypes_test
 
 import (
+	"errors"
 	"errortypes/src"
 	"net/http"
 	"net/http/httptest"
@@ -13,17 +14,19 @@ func TestGetDataIntegration(t *testing.T) {
 			res.WriteHeader(http.StatusTeapot)
 		}))
 		defer svr.Close()
+
 		_, err := errortypes.DumbGetter(svr.URL)
+
 		if err == nil {
 			t.Fatal("expected an error")
 		}
 
-		got, isStatusErr := err.(errortypes.BadStatusError)
-		if !isStatusErr {
+		var got errortypes.BadStatusError
+		isBadStatusError := errors.As(err, &got)
+		want := errortypes.BadStatusError{URL: svr.URL, Status: http.StatusTeapot}
+		if !isBadStatusError {
 			t.Fatalf("was not a BadStatusError, got %T", err)
 		}
-
-		want := errortypes.BadStatusError{URL: svr.URL, Status: http.StatusTeapot}
 
 		if got != want {
 			t.Errorf("got %v, want %v", got, want)
