@@ -2,7 +2,6 @@ package errortypes_test
 
 import (
 	"errortypes/src"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,11 +17,16 @@ func TestGetDataIntegration(t *testing.T) {
 		if err == nil {
 			t.Fatal("expected an error")
 		}
-		want := fmt.Sprintf("did not get 200 from %s, got %d", svr.URL, http.StatusTeapot)
-		got := err.Error()
+
+		got, isStatusErr := err.(errortypes.BadStatusError)
+		if !isStatusErr {
+			t.Fatalf("was not a BadStatusError, got %T", err)
+		}
+
+		want := errortypes.BadStatusError{URL: svr.URL, Status: http.StatusTeapot}
 
 		if got != want {
-			t.Errorf(`got "%v", want "%v"`, got, want)
+			t.Errorf("got %v, want %v", got, want)
 		}
 	})
 }
