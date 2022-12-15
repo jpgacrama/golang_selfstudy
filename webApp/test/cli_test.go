@@ -19,7 +19,7 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
 		assertGameStartedWith(t, game, 3)
-		assertFinishWith(t, game, "Chris")
+		assertFinishCalledWith(t, game, "Chris")
 	})
 	t.Run("start game with 8 players and record 'Cleo' as winner", func(t *testing.T) {
 		game := &poker.GameSpy{}
@@ -28,7 +28,7 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(in, dummyStdOut, game)
 		cli.PlayPoker()
 		assertGameStartedWith(t, game, 8)
-		assertFinishWith(t, game, "Cleo")
+		assertFinishCalledWith(t, game, "Cleo")
 	})
 }
 
@@ -138,7 +138,7 @@ func TestGame_Finish(t *testing.T) {
 		cli.PlayPoker()
 		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
 		assertGameStartedWith(t, game, 3)
-		assertFinishWith(t, game, "Chris")
+		assertFinishCalledWith(t, game, "Chris")
 	})
 	t.Run("start game with 8 players and record 'Cleo' as winner", func(t *testing.T) {
 		game := &poker.GameSpy{}
@@ -147,7 +147,7 @@ func TestGame_Finish(t *testing.T) {
 		cli := poker.NewCLI(in, dummyStdOut, game)
 		cli.PlayPoker()
 		assertGameStartedWith(t, game, 8)
-		assertFinishWith(t, game, "Cleo")
+		assertFinishCalledWith(t, game, "Cleo")
 	})
 	t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
 		game := &poker.GameSpy{}
@@ -201,11 +201,13 @@ func assertGameStartedWith(t testing.TB, game *poker.GameSpy, numPlayers int) {
 	}
 }
 
-func assertFinishWith(t testing.TB, game *poker.GameSpy, winner string) {
+func assertFinishCalledWith(t testing.TB, game *poker.GameSpy, winner string) {
 	t.Helper()
-	got_winner := game.FinishCalledWith
-	if got_winner != winner {
-		t.Fatalf("Winner is wrong. Expected: %s, Got:%s", winner, got_winner)
+	passed := retryUntil(500*time.Millisecond, func() bool {
+		return game.FinishCalledWith == winner
+	})
+	if !passed {
+		t.Errorf("expected finish called with %q but got %q", winner, game.FinishCalledWith)
 	}
 }
 
@@ -215,4 +217,14 @@ func assertGameError(t testing.TB, game *poker.GameSpy) {
 	if gotFinishCalledWith != "" {
 		t.Fatalf("Game should have thrown an error.")
 	}
+}
+
+func retryUntil(d time.Duration, f func() bool) bool {
+	deadline := time.Now().Add(d)
+	for time.Now().Before(deadline) {
+		if f() {
+			return true
+		}
+	}
+	return false
 }
